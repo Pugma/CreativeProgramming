@@ -1,0 +1,40 @@
+name: client
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "/client/**/*"
+      - .github/workflows/client.yaml
+
+jobs:
+  setup-packages:
+    name: Check npm packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          path: "./client"
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - name: npm ci
+        run: npm ci
+  build-check:
+    name: Check npm build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - name: npm ci
+        run: npm ci
+      - name: Run build
+        run: npm run build
