@@ -1,0 +1,23 @@
+name: server
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "/server/**/*"
+      - .github/workflows/server.yaml
+
+jobs:
+  build-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: server
+      - name: install cargo
+        run: curl -y --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+      - name: build files
+        run: cargo build --release
+        working-directory: ./server/
