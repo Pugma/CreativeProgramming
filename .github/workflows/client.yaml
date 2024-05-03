@@ -20,7 +20,7 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v4
         with:
-          node-version-file: .node-version
+          node-version-file: ./client/.node-version
           cache: npm
       - name: npm ci
         run: npm ci
@@ -32,7 +32,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: .node-version
+          node-version-file: ./client/.node-version
           cache: npm
       - name: npm ci
         run: npm ci
