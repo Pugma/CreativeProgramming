@@ -2,7 +2,7 @@ openapi: 3.1.1
 
 info:
   title: CreativeProgramming
-  description: A novel Rust scheduling
+  description: A novel Rust scheduling app
   version: 0.1.0
 
 servers:
