@@ -1,0 +1,135 @@
+openapi: 3.1.1
+
+info:
+  title: CreativeProgramming
+  description: A novel Rust scheduling
+  version: 0.1.0
+
+servers:
+  - url: /api
+
+tags:
+  - name: auth
+    description: related to authentication
+  - name: schedule
+    description: related to scheduling
+
+paths:
+  /login:
+    post:
+      summary: login
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/PostLogin"
+      responses:
+        200:
+          description: Success
+  
+  /schedule/{groupId}:
+    get:
+      summary: schedule view
+      tags:
+        - schedule
+      parameters:
+        - in: path
+          name: groupId
+          description: ID of groups
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/GetSchedule"
+        403:
+          description: Forbidden
+    post:
+      summary: register schedule
+      tags:
+        - schedule
+      parameters:
+        - in: path
+          name: groupId
+          description: ID of groups
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/ScheduleItem"
+      responses:
+        200:
+          description: Success
+        403:
+          description: Forbidden
+    put:
+      summary: edit schedule
+      tags:
+        - schedule
+      parameters:
+        - in: path
+        name: groupId
+        description: ID of groups
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/ScheduleItem"
+      responses:
+        200:
+          description: Success
+        403:
+          description: Forbidden
+
+components:
+  schemas:
+    PostLogin:
+      type: object
+      properties:
+        GroupCode:
+          type: string
+        Password:
+          type: string
+      required:
+        - GroupCode
+        - Password
+    GetSchedule:
+      type: array
+      items:
+        $ref: "#components/schemas/ScheduleItem"
+    ScheduleItem:
+      type: object
+      properties:
+        UserName:
+          type: string
+        Year:
+          type: int
+        Month:
+          type: int
+        Week:
+          type: int
+        Condition:
+          type: int
+      required:
+        - UserName
+        - Year
+        - Month
+        - Week
+        - Condition
