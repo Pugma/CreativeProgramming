@@ -1,0 +1,48 @@
+name: client
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "/client/**/*"
+      - .github/workflows/client.yaml
+
+jobs:
+  setup-packages:
+    name: Check npm packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: client
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ./client/.node-version
+          cache: npm
+          cache-dependency-path: ./client/package-lock.json
+      - name: npm ci
+        run: npm ci
+        working-directory: ./client/
+  build-check:
+    name: Check npm build
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: client
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ./client/.node-version
+          cache: npm
+          cache-dependency-path: ./client/package-lock.json
+      - name: npm ci
+        run: npm ci
+        working-directory: ./client/
+      - name: Run build
+        run: npm run build
+        working-directory: ./client/
