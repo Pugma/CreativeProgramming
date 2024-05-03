@@ -22,6 +22,7 @@ jobs:
         with:
           node-version-file: ./client/.node-version
           cache: npm
+          cache-dependency-path: ./client/package-lock.json
       - name: npm ci
         run: npm ci
   build-check:
@@ -37,6 +38,7 @@ jobs:
         with:
           node-version-file: ./client/.node-version
           cache: npm
+          cache-dependency-path: ./client/package-lock.json
       - name: npm ci
         run: npm ci
       - name: Run build
