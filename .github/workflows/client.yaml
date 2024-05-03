@@ -16,7 +16,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
         with:
-          path: "./client"
+          path: client
       - name: setup node
         uses: actions/setup-node@v4
         with:
@@ -28,7 +28,10 @@ jobs:
     name: Check npm build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          path: client
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
