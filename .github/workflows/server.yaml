@@ -29,6 +29,7 @@ jobs:
           sparse-checkout: server
       - name: clippy
         run: cargo clippy --all-features -- -D warnings
+        working-directory: ./server/
 
   build-check:
     runs-on: ubuntu-latest
