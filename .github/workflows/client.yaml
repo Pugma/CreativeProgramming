@@ -26,8 +26,10 @@ jobs:
       - name: npm ci
         run: npm ci
         working-directory: ./client/
+
   build-check:
     name: Check npm build
+    needs: [setup-packages]
     runs-on: ubuntu-latest
     steps:
       - name: checkout
