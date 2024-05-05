@@ -2,8 +2,8 @@ FROM rust:1.78-alpine3.19
 
 WORKDIR /app
 
-COPY . .
+COPY /server .
 
-RUN cargo build --release
+RUN apk add musl-dev && cargo build --release
 
 ENTRYPOINT [ "/app/target/release/server" ]
