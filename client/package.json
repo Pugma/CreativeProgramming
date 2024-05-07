@@ -12,7 +12,8 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "format": "prettier --write src/",
     "api-client": "openapi-generator-cli generate -g typescript-axios -i ../docs/openapi.yaml -o ./src/lib/apis/generated",
-    "api-server": "openapi-generator-cli generate -g rust -i ../docs/openapi.yaml -o ../server/apis/"
+    "api-server": "openapi-generator-cli generate -g rust -i ../docs/openapi.yaml -o ../server/apis/",
+    "postinstall": "npm run api-client"
   },
   "dependencies": {
     "vue": "^3.4.21",
