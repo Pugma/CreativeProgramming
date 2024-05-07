@@ -1,3 +1,4 @@
+extern crate openapi;
 use axum::{routing::get, Router};
 
 #[tokio::main]
