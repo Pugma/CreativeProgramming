@@ -4,7 +4,6 @@ use axum::{routing::get, Router};
 #[tokio::main]
 async fn main() {
     // 最初に初期化をする
-    // 変数のシャドウを使いながらパスを追加
     let app = Router::new().route("/", get(|| async { "Hello, world!" }));
 
     // HTTP リスナーの定義
