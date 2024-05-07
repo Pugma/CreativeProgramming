@@ -42,8 +42,8 @@ paths:
           required: true
           schema:
             type: string
-      requestBody:
-        required: false
+      # requestBody:
+      #   required: false
       responses:
         200:
           description: Success
@@ -81,11 +81,11 @@ paths:
         - schedule
       parameters:
         - in: path
-        name: groupId
-        description: ID of groups
-        required: true
-        schema:
-          type: string
+          name: groupId
+          description: ID of groups
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -120,13 +120,13 @@ components:
         UserName:
           type: string
         Year:
-          type: int
+          type: integer
         Month:
-          type: int
+          type: integer
         Week:
-          type: int
+          type: integer
         Condition:
-          type: int
+          type: integer
       required:
         - UserName
         - Year
