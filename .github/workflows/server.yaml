@@ -22,7 +22,7 @@ jobs:
       - name: generate api
         run: >-
           docker run --rm -v "${PWD}:/local" -u $(id -u) openapitools/openapi-generator-cli generate \
-            -i ../docs/openapi.yaml \
+            -i /openapi.yaml \
             -g rust
             -o /local/apis
         working-directory: ./server
@@ -33,6 +33,8 @@ jobs:
           path: ./server/apis
 
   format-check:
+    name: check format
+    needs: [gen-api]
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -49,6 +51,8 @@ jobs:
         working-directory: ./server/
 
   clippy-check:
+    name: check clippy
+    needs: [gen-api]
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -65,8 +69,9 @@ jobs:
         working-directory: ./server/
 
   build-check:
+    name: check format
+    needs: [gen-api, format-check, clippy-check]
     runs-on: ubuntu-latest
-    needs: [format-check, clippy-check]
     steps:
       - name: checkout
         uses: actions/checkout@v4
