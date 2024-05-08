@@ -9,26 +9,6 @@ on:
       - .github/workflows/client.yaml
 
 jobs:
-  gen-api:
-    name: generate and upload api files
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            client
-            docs/openapi.yaml
-      - name: npm ci
-        run: npm ci
-      - name: generate api
-        run: npm run api-client
-      - name: upload api files
-        uses: actions/upload-artifact@v4
-        with:
-          name: apis
-          path: ./client/src/lib/apis/generated
-
   setup-packages:
     name: Check npm packages
     runs-on: ubuntu-latest
@@ -46,6 +26,28 @@ jobs:
       - name: npm ci
         run: npm ci
         working-directory: ./client/
+
+  gen-api:
+    name: generate and upload api files
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            client
+            docs/openapi.yaml
+      - name: npm ci
+        run: npm ci
+        working-directory: ./client/
+      - name: generate api
+        run: npm run api-client
+        working-directory: ./client/
+      - name: upload api files
+        uses: actions/upload-artifact@v4
+        with:
+          name: apis
+          path: ./client/src/lib/apis/generated
 
   build-check:
     name: Check npm build
