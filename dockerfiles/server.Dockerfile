@@ -18,6 +18,6 @@ WORKDIR /server
 
 COPY --from=api-generator /app/server .
 
-RUN apk add musl-dev && cargo build --release
+RUN apk add musl-dev pkgconfig && cargo build --release
 
 ENTRYPOINT [ "./server/target/release/app" ]
