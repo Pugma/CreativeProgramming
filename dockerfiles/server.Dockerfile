@@ -1,14 +1,15 @@
 # API生成
-FROM openapitools/openapi-generator-cli AS api-generator
+FROM docker:26.1.1-alpine3.19 AS api-generator
 
 WORKDIR /app
 
-COPY . .
+COPY ./docs ./docs
+COPY ./server ./server
 
-RUN openapi-generator-cli generate \
-    -i /app/docs/openapi.yaml \
+RUN docker run --rm -v "${PWD}:/local" -u $(id -u) openapitools/openapi-generator-cli generate \
+    -i /local/docs/openapi.yaml \
     -g rust \
-    -o /app/server/apis
+    -o /local/server/apis
 
 
 # server のビルド
