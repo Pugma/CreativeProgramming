@@ -7,7 +7,7 @@ COPY . .
 
 WORKDIR /app/client
 
-RUN apk add install -y default-jre &&\
+RUN apk --update add install -y default-jre &&\
     npm ci && npm run api-server
 
 
