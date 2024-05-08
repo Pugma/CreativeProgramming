@@ -7,7 +7,7 @@ COPY . .
 
 WORKDIR /app/client
 
-RUN apk add install default-jre &&\
+RUN apk add openjdk11-jre-headless &&\
     npm ci && npm run api-server
 
 
