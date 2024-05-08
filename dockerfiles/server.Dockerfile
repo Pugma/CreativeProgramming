@@ -12,7 +12,7 @@ RUN docker run --rm -v "${PWD}:/local" -u $(id -u) openapitools/openapi-generato
     -o /local/server/apis
 
 
-# server のビルド
+# server のビルド & 最終的な配信
 FROM rust:1.78-alpine3.19 AS server
 
 WORKDIR /server
@@ -21,11 +21,4 @@ COPY --from=api-generator /app/server .
 
 RUN apk add musl-dev && cargo build --release
 
-# 最終的な配信用
-FROM alpine:3.19.1
-
-WORKDIR /app
-
-COPY --from=server /server/target/release/app app
-
-ENTRYPOINT [ "./app" ]
+ENTRYPOINT [ "./server/target/release/app" ]
