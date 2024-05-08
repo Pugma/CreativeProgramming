@@ -5,7 +5,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN generate \
+RUN openapi-generator-cli generate \
     -i /app/docs/openapi.yaml \
     -g rust \
     -o /app/server/apis
