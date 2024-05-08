@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "/client/**/*"
+      - "/client/**"
       - .github/workflows/client.yaml
 
 jobs:
@@ -27,9 +27,31 @@ jobs:
         run: npm ci
         working-directory: ./client/
 
+  gen-api:
+    name: generate and upload api files
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            client
+            docs/openapi.yaml
+      - name: npm ci
+        run: npm ci
+        working-directory: ./client/
+      - name: generate api
+        run: npm run api-client
+        working-directory: ./client/
+      - name: upload api files
+        uses: actions/upload-artifact@v4
+        with:
+          name: apis
+          path: ./client/src/lib/apis/generated
+
   build-check:
     name: Check npm build
-    needs: [setup-packages]
+    needs: [setup-packages, gen-api]
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -45,6 +67,11 @@ jobs:
       - name: npm ci
         run: npm ci
         working-directory: ./client/
+      - name: download api files
+        uses: actions/download-artifact@v4
+        with:
+          name: apis
+          path: ./client/src/lib/apis/generated
       - name: Run build
         run: npm run build
         working-directory: ./client/

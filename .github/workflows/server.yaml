@@ -5,40 +5,82 @@ on:
     branches:
       - main
     paths:
-      - "/server/**/*"
+      - "/server/**"
       - .github/workflows/server.yaml
 
 jobs:
+  gen-api:
+    name: generate and upload api files
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            server
+            docs/openapi.yaml
+      - name: generate api
+        run: >-
+          docker run --rm -v "${PWD}:/local" -u $(id -u) openapitools/openapi-generator-cli generate \
+            -i /local/docs/openapi.yaml \
+            -g rust \
+            -o /local/server/apis
+      - name: upload api files
+        uses: actions/upload-artifact@v4
+        with:
+          name: apis
+          path: ./server/apis
+
   format-check:
+    name: check format
+    needs: [gen-api]
     runs-on: ubuntu-latest
     steps:
       - name: checkout
         uses: actions/checkout@v4
         with:
           sparse-checkout: server
+      - name: downloadload api files
+        uses: actions/download-artifact@v4
+        with:
+          name: apis
+          path: ./server/apis
       - name: fmt
-        run: cargo fmt --all -- --check
+        run: cargo fmt --package app --check
         working-directory: ./server/
 
   clippy-check:
+    name: check clippy
+    needs: [gen-api]
     runs-on: ubuntu-latest
     steps:
       - name: checkout
         uses: actions/checkout@v4
         with:
           sparse-checkout: server
+      - name: downloadload api files
+        uses: actions/download-artifact@v4
+        with:
+          name: apis
+          path: ./server/apis
       - name: clippy
-        run: cargo clippy --all-features -- -D warnings
+        run: cargo clippy --package app --no-deps -- -D warnings
         working-directory: ./server/
 
   build-check:
+    name: check format
+    needs: [gen-api, format-check, clippy-check]
     runs-on: ubuntu-latest
-    needs: [format-check, clippy-check]
     steps:
       - name: checkout
         uses: actions/checkout@v4
         with:
           sparse-checkout: server
+      - name: downloadload api files
+        uses: actions/download-artifact@v4
+        with:
+          name: apis
+          path: ./server/apis
       - name: build files
         run: cargo build --release
         working-directory: ./server/
