@@ -1,15 +1,14 @@
 # API生成
-FROM docker:26.1.1-alpine3.19 AS api-generator
+FROM node:22.1-alpine3.19 AS api-generator
 
 WORKDIR /app
 
-COPY ./docs ./docs
-COPY ./server ./server
+COPY . .
 
-RUN docker run --rm -v "${PWD}:/local" -u $(id -u) openapitools/openapi-generator-cli generate \
-    -i /local/docs/openapi.yaml \
-    -g rust \
-    -o /local/server/apis
+WORKDIR /app/client
+
+RUN apt-get install -y default-jre &&\
+    npm ci && npm run api-server
 
 
 # server のビルド & 最終的な配信
