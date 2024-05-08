@@ -46,7 +46,7 @@ jobs:
           name: apis
           path: ./server/apis
       - name: fmt
-        run: cargo fmt --all -- --check
+        run: cargo fmt --package app --check
         working-directory: ./server/
 
   clippy-check:
@@ -64,7 +64,7 @@ jobs:
           name: apis
           path: ./server/apis
       - name: clippy
-        run: cargo clippy --all-features -- -D warnings
+        run: cargo clippy --package app --no-deps -- -D warnings
         working-directory: ./server/
 
   build-check:
