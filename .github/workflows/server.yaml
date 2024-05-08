@@ -24,8 +24,8 @@ jobs:
           docker run --rm -v "${PWD}:/local" -u $(id -u) openapitools/openapi-generator-cli generate \
             -i docs/openapi.yaml \
             -g rust
-            -o /local
-        working-directory: ./server/apis
+            -o /local/apis
+        working-directory: ./server
       - name: upload api files
         uses: actions/upload-artifact@v4
         with:
