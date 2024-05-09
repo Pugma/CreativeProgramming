@@ -20,4 +20,11 @@ COPY --from=api-generator /app/server .
 
 RUN cargo build --release
 
-ENTRYPOINT [ "./server/target/release/app" ]
+# 最終的な配信用
+FROM alpine
+
+WORKDIR /server
+
+COPY --from=stage /server/target/release/app app
+
+ENTRYPOINT [ "./app" ]
