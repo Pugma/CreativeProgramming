@@ -25,6 +25,6 @@ FROM alpine
 
 WORKDIR /server
 
-COPY --from=stage /server/target/release/app app
+COPY --from=server /server/target/release/app app
 
 ENTRYPOINT [ "./app" ]
