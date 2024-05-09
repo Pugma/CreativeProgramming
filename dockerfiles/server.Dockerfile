@@ -21,7 +21,7 @@ COPY --from=api-generator /app/server .
 RUN cargo build --release
 
 # 最終的な配信用
-FROM alpine
+FROM gcr.io/distroless/cc-debian12
 
 WORKDIR /server
 
