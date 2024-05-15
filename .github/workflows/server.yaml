@@ -5,8 +5,9 @@ on:
     branches:
       - main
     paths:
-      - "/server/**"
+      - server/**
       - .github/workflows/server.yaml
+  workflow_dispatch:
 
 jobs:
   gen-api:
@@ -23,7 +24,7 @@ jobs:
         run: >-
           docker run --rm -v "${PWD}:/local" -u $(id -u) openapitools/openapi-generator-cli generate \
             -i /local/docs/openapi.yaml \
-            -g rust \
+            -g rust-axum \
             -o /local/server/apis
       - name: upload api files
         uses: actions/upload-artifact@v4
@@ -32,7 +33,7 @@ jobs:
           path: ./server/apis
 
   format-check:
-    name: check format
+    name: format check
     needs: [gen-api]
     runs-on: ubuntu-latest
     steps:
@@ -50,7 +51,7 @@ jobs:
         working-directory: ./server/
 
   clippy-check:
-    name: check clippy
+    name: clippy check
     needs: [gen-api]
     runs-on: ubuntu-latest
     steps:
@@ -68,7 +69,7 @@ jobs:
         working-directory: ./server/
 
   build-check:
-    name: check format
+    name: build check
     needs: [gen-api, format-check, clippy-check]
     runs-on: ubuntu-latest
     steps:
