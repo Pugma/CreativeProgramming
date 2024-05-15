@@ -32,7 +32,7 @@ impl Api for Count {
         let aaa = "文字列リテラル".to_string();
 
         let result = match body.group_code.as_str() {
-            "aaa"  => Ok(openapi::LoginPostResponse::Status200_Success),
+            "aaa" => Ok(openapi::LoginPostResponse::Status200_Success),
             _ => Err(aaa),
         };
 
