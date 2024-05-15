@@ -11,7 +11,7 @@ on:
 
 jobs:
   setup-packages:
-    name: Check npm packages
+    name: check npm packages
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -51,7 +51,7 @@ jobs:
           path: ./client/src/lib/apis/generated
 
   build-check:
-    name: Check npm build
+    name: check npm build
     needs: [setup-packages, gen-api]
     runs-on: ubuntu-latest
     steps:

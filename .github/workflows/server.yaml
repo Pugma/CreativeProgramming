@@ -33,7 +33,7 @@ jobs:
           path: ./server/apis
 
   format-check:
-    name: check format
+    name: format check
     needs: [gen-api]
     runs-on: ubuntu-latest
     steps:
@@ -51,7 +51,7 @@ jobs:
         working-directory: ./server/
 
   clippy-check:
-    name: check clippy
+    name: clippy check
     needs: [gen-api]
     runs-on: ubuntu-latest
     steps:
@@ -69,7 +69,7 @@ jobs:
         working-directory: ./server/
 
   build-check:
-    name: check format
+    name: build check
     needs: [gen-api, format-check, clippy-check]
     runs-on: ubuntu-latest
     steps:
