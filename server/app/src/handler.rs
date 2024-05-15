@@ -29,7 +29,7 @@ impl Api for Count {
         'life0: 'async_trait,
         Self: 'async_trait,
     {
-        let aaa = "Stringにしたいんだが！？".to_string();
+        let aaa = "文字列リテラル".to_string();
 
         let result = match body.group_code {
             aaa => Ok(openapi::LoginPostResponse::Status200_Success),
