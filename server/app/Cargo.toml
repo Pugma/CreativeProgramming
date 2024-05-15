@@ -9,3 +9,5 @@ edition = "2021"
 axum = "0.7.5"
 tokio = { version = "1.37.0", features = ["macros", "rt-multi-thread"] }
 openapi = { path = "../apis/" }
+axum-extra = "0.9.3"
+sqlx = { version = "0.7.4", features = ["mysql"]}
