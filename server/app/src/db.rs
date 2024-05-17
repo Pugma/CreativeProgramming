@@ -1,6 +1,7 @@
 use once_cell::sync::Lazy;
 
 use anyhow;
+use sqlx::mysql::MySqlConnectOptions;
 use sqlx::{mysql::MySqlPoolOptions, MySql, Pool};
 use std::env;
 use std::string::String;
@@ -10,21 +11,23 @@ pub struct DataBaseConfig {
     db_database: String,
     db_username: String,
     db_password: String,
-    db_port: String,
+    db_port: u16,
 }
 
 impl DataBaseConfig {
-    fn db_url(&self) -> String {
-        format!(
-            "mysql://{}:{}@{}:{}/{}",
-            self.db_username, self.db_password, self.db_hostname, self.db_port, self.db_database
-        )
+    fn options(&self) -> MySqlConnectOptions {
+        MySqlConnectOptions::new()
+            .host(&self.db_hostname)
+            .port(self.db_port)
+            .username(&self.db_username)
+            .password(&self.db_password)
+            .database(&self.db_database)
     }
 }
 
 static CONFIG: Lazy<DataBaseConfig> = Lazy::new(|| DataBaseConfig {
     db_hostname: env::var("DB_HOSTNAME").unwrap(),
-    db_port: env::var("DB_PORT").unwrap(),
+    db_port: env::var("DB_PORT").unwrap().parse().unwrap(),
     db_username: env::var("DB_USERNAME").unwrap(),
     db_password: env::var("DB_PASSWORD").unwrap(),
     db_database: env::var("DB_DATABASE").unwrap(),
@@ -35,11 +38,11 @@ pub async fn setup_db() -> Result<Pool<MySql>, String> {
     // コネクションプールの設定
     let pool = match MySqlPoolOptions::new()
         .max_connections(10)
-        .connect(CONFIG.db_url().as_str())
+        .connect_with(CONFIG.options())
         .await
     {
         Ok(a) => a,
-        Err(_) => return Err("".to_string()),
+        Err(e) => return Err(e.to_string()),
     };
 
     Ok(pool)
