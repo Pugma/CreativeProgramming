@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import apis, { type PostLogin } from '@/lib/apis'
+import { AuthApi, type PostLogin, Configuration } from '@/lib/apis'
+
+const apis = new AuthApi(new Configuration({ basePath: '/api' }))
+
 const newUserName = ref('')
 const newPassword = ref('')
 const request = ref<PostLogin>({
