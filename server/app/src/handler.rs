@@ -3,6 +3,7 @@ use core;
 // use openapi::Api;
 use sqlx::{mysql::MySqlQueryResult, MySql, Pool};
 
+extern crate openapi;
 use crate::db;
 use crate::openapi::Api;
 
