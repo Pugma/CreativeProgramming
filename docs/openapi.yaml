@@ -15,6 +15,23 @@ tags:
     description: related to scheduling
 
 paths:
+  /signUp:
+    post:
+      summary: sign up
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostLogin"
+      responses:
+        200:
+          description: Success
+        403:
+          description: Bad request
+
   /login:
     post:
       summary: login
@@ -103,12 +120,12 @@ components:
     PostLogin:
       type: object
       properties:
-        GroupCode:
+        UserName:
           type: string
         Password:
           type: string
       required:
-        - GroupCode
+        - UserName
         - Password
     GetSchedule:
       type: array

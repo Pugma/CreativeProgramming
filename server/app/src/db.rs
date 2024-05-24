@@ -1,7 +1,6 @@
 use once_cell::sync::Lazy;
 
-use anyhow;
-use sqlx::mysql::MySqlConnectOptions;
+use sqlx::mysql::{MySqlConnectOptions, MySqlQueryResult};
 use sqlx::{mysql::MySqlPoolOptions, MySql, Pool};
 use std::env;
 use std::string::String;
@@ -36,29 +35,31 @@ static CONFIG: Lazy<DataBaseConfig> = Lazy::new(|| DataBaseConfig {
 #[tokio::main(flavor = "current_thread")]
 pub async fn setup_db() -> Result<Pool<MySql>, String> {
     // コネクションプールの設定
-    let pool = match MySqlPoolOptions::new()
+    let pool = MySqlPoolOptions::new()
         .max_connections(10)
         .connect_with(CONFIG.options())
-        .await
-    {
-        Ok(a) => a,
+        .await;
+
+    match pool {
+        Ok(p) => return Ok(p),
         Err(e) => return Err(e.to_string()),
     };
-
-    Ok(pool)
 }
 
-pub async fn add_todo(pool: Pool<MySql>, _: String) -> anyhow::Result<u64> {
+pub async fn add_user(
+    pool: Pool<MySql>,
+    user_name: String,
+    password: String,
+) -> Result<MySqlQueryResult, String> {
     // Insert the task, then obtain the ID of this row
-    let todo_id = sqlx::query(
-        r#"
-INSERT INTO todos ( description )
-VALUES ( ? )
-        "#,
-    )
-    .execute(&pool)
-    .await?
-    .last_insert_id();
+    let result = sqlx::query("INSERT INTO `users` ( `userName`, `password` )VALUES ( ?, ? )")
+        .bind(user_name)
+        .bind(password)
+        .execute(&pool)
+        .await;
 
-    Ok(todo_id)
+    match result {
+        Ok(r) => Ok(r),
+        Err(e) => Err(e.to_string()),
+    }
 }
