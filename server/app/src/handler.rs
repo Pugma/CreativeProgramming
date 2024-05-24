@@ -3,9 +3,9 @@ use core;
 // use openapi::Api;
 use sqlx::{mysql::MySqlQueryResult, MySql, Pool};
 
-extern crate openapi;
 use crate::db;
-use crate::openapi::Api;
+use axum::async_trait;
+use openapi::Api;
 
 #[derive(Clone)]
 pub struct Count(pub Pool<MySql>);
@@ -16,6 +16,7 @@ impl AsRef<Count> for Count {
     }
 }
 
+#[async_trait]
 impl Api for Count {
     fn sign_up_post<'life0, 'async_trait>(
         &'life0 self,
