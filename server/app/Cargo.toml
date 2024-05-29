@@ -12,6 +12,4 @@ openapi = { path = "../apis/" }
 axum-extra = "0.9.3"
 sqlx = { version = "0.7.4", features = ["mysql", "runtime-tokio"] }
 once_cell = "1.19.0"
-structopt = "0.3.26"
-anyhow = "1.0.83"
 uuid = { version = "1.8.0", features = ["v7"] }
