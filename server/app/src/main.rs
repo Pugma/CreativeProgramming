@@ -3,6 +3,7 @@ pub mod handler;
 
 extern crate openapi;
 use std::thread;
+use tower_http::services::{ServeDir, ServeFile};
 
 use db::setup_db;
 
@@ -21,9 +22,14 @@ async fn main() {
     .expect("Thread panicked");
 
     let state = Count(db_pool);
+    let static_dir = ServeFile::new("/dist/index.html");
+    let serve_dir_from_assets = ServeDir::new("/dist/assets/");
+    // let serve_dir_from_dist = ServeDir::new("dist");
 
     // 最初に初期化をする
-    let app = openapi::server::new(state);
+    let app = openapi::server::new(state)
+        .nest_service("/assets", serve_dir_from_assets)
+        .fallback_service(static_dir);
 
     // TCP リスナーの定義
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
