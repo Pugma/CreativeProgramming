@@ -5,6 +5,8 @@ use sqlx::{mysql::MySqlPoolOptions, MySql, Pool};
 use std::env;
 use std::string::String;
 
+use sha2::{Digest, Sha512};
+
 pub struct DataBaseConfig {
     db_hostname: String,
     db_database: String,
@@ -52,6 +54,8 @@ pub async fn add_user(
     password: String,
 ) -> Result<MySqlQueryResult, String> {
     // Insert the task, then obtain the ID of this row
+    let hashed_password = Sha512::digest(password);
+    let password = format!("{:x}", hashed_password);
     let result = sqlx::query("INSERT INTO `users` ( `userName`, `password` )VALUES ( ?, ? )")
         .bind(user_name)
         .bind(password)
