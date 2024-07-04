@@ -66,10 +66,17 @@ impl Api for Count {
         'life0: 'async_trait,
         Self: 'async_trait,
     {
-        let aaa = "文字列リテラル".to_string();
+        let db_result: Result<bool, String> = tokio::task::block_in_place(move || {
+            tokio::runtime::Handle::current().block_on(async move {
+                db::check_user(self.0.clone(), body.user_name, body.password).await
+            })
+        });
 
-        let result = match body.user_name.as_str() {
-            "aaa" => Ok(LoginPostResponse::Status200_Success),
+        let aaa = "aaaa".to_string();
+
+        let result = match db_result {
+            Ok(true) => Ok(LoginPostResponse::Status200_Success),
+            Ok(false) => Err(aaa),
             _ => Err(aaa),
         };
 
