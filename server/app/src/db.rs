@@ -1,7 +1,9 @@
 use once_cell::sync::Lazy;
 
-use sqlx::mysql::{MySqlConnectOptions, MySqlQueryResult};
-use sqlx::{mysql::MySqlPoolOptions, MySql, Pool};
+use sqlx::{
+    mysql::{MySqlConnectOptions, MySqlPoolOptions, MySqlQueryResult},
+    query, query_as, MySql, Pool,
+};
 use std::env;
 use std::string::String;
 
@@ -11,6 +13,16 @@ pub struct DataBaseConfig {
     db_username: String,
     db_password: String,
     db_port: u16,
+}
+
+#[derive(sqlx::FromRow)]
+struct Password(String);
+
+impl Password {
+    fn to_string(self) -> String {
+        let temp: String = self.0;
+        temp
+    }
 }
 
 impl DataBaseConfig {
@@ -54,13 +66,35 @@ pub async fn add_user(
     // Insert the task, then obtain the ID of this row
     let password = bcrypt::hash(password, bcrypt::DEFAULT_COST).unwrap();
     // let password = format!("{:x}", hashed_password);
-    let result = sqlx::query("INSERT INTO `users` ( `userName`, `password` )VALUES ( ?, ? )")
+    let result = query("INSERT INTO `users` ( `userName`, `password` ) VALUES ( ?, ? )")
         .bind(user_name)
         .bind(password)
         .execute(&pool)
         .await;
 
     match result {
+        Ok(r) => Ok(r),
+        Err(e) => Err(e.to_string()),
+    }
+}
+
+pub async fn check_user(
+    pool: Pool<MySql>,
+    user_name: String,
+    password: String,
+) -> Result<bool, String> {
+    let password = bcrypt::hash(password, bcrypt::DEFAULT_COST).unwrap();
+
+    let correct_password =
+        query_as::<_, Password>("SELECT `password` FROM `users` WHERE `userName`=?")
+            .bind(user_name)
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+
+    let res = bcrypt::verify(password, &correct_password.to_string());
+
+    match res {
         Ok(r) => Ok(r),
         Err(e) => Err(e.to_string()),
     }
