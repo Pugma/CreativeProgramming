@@ -19,8 +19,8 @@ pub struct DataBaseConfig {
 struct Password(String);
 
 impl Password {
-    fn to_string(self) -> String {
-        let temp: String = self.0;
+    fn to_string(&self) -> &str {
+        let temp: &String = &self.0;
         temp
     }
 }
@@ -92,7 +92,7 @@ pub async fn check_user(
             .await
             .unwrap();
 
-    let res = bcrypt::verify(password, &correct_password.to_string());
+    let res = bcrypt::verify(password, correct_password.to_string());
 
     match res {
         Ok(r) => Ok(r),
