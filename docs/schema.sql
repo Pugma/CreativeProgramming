@@ -24,8 +24,8 @@ CREATE TABLE IF NOT EXISTS `userGroup` (
 CREATE TABLE IF NOT EXISTS `schedule` (
     `groupId` INT(11) NOT NULL,
     `userName` VARCHAR(50) NOT NULL,
-    `since` DATETIME NOT NULL,
-    `until` DATETIME NOT NULL,
+    `since` DATE NOT NULL,
+    `until` DATE NOT NULL,
     `condition` TINYINT(1) NOT NULL,
     `lastUpdate` DATETIME NOT NULL,
     PRIMARY KEY (`groupId`),

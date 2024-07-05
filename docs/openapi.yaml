@@ -29,7 +29,7 @@ paths:
       responses:
         200:
           description: Success
-        403:
+        400:
           description: Bad request
 
   /login:
@@ -46,6 +46,8 @@ paths:
       responses:
         200:
           description: Success
+        400:
+          description: Bad request
   
   /schedule/{groupId}:
     get:
@@ -68,10 +70,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetSchedule"
-        403:
-          description: Forbidden
+        404:
+          description: Not Found
     post:
-      summary: register schedule
+      summary: register schedule to an exist group
       tags:
         - schedule
       parameters:
@@ -90,8 +92,8 @@ paths:
       responses:
         200:
           description: Success
-        403:
-          description: Forbidden
+        404:
+          description: Not Found
     put:
       summary: edit schedule
       tags:
@@ -112,8 +114,8 @@ paths:
       responses:
         200:
           description: Success
-        403:
-          description: Forbidden
+        404:
+          description: Not Found
 
 components:
   schemas:
@@ -136,17 +138,16 @@ components:
       properties:
         UserName:
           type: string
-        Year:
-          type: integer
-        Month:
-          type: integer
-        Week:
-          type: integer
+        Since:
+          type: string
+          format: date
+        Until:
+          type: string
+          format: date
         Condition:
           type: integer
       required:
         - UserName
-        - Year
-        - Month
-        - Week
+        - Since
+        - Until
         - Condition
