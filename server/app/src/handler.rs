@@ -45,8 +45,8 @@ impl Api for Count {
         });
 
         let result = match db_result {
-            Ok(_) => Ok(openapi::SignUpPostResponse::Status200_Success),
-            _ => Err("Failed to ".to_string()),
+            Ok(_) => Ok(SignUpPostResponse::Status200_Success),
+            _ => Ok(SignUpPostResponse::Status400_BadRequest),
         };
 
         println!("Login requested");
@@ -76,7 +76,7 @@ impl Api for Count {
 
         let result = match db_result {
             Ok(true) => Ok(LoginPostResponse::Status200_Success),
-            Ok(false) => Err(aaa),
+            Ok(false) => Ok(LoginPostResponse::Status400_BadRequest),
             _ => Err(aaa),
         };
 
