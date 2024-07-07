@@ -1,4 +1,4 @@
-openapi: 3.1.1
+openapi: 3.0.3
 
 info:
   title: CreativeProgramming
@@ -11,6 +11,8 @@ servers:
 tags:
   - name: auth
     description: related to authentication
+  - name: user
+    description: related to user data
   - name: schedule
     description: related to scheduling
 
@@ -48,7 +50,22 @@ paths:
           description: Success
         400:
           description: Bad request
-  
+
+  /me:
+    get:
+      summary: group list
+      tags:
+        - user
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetGroups"
+        401:
+          description: Not authorized
+
   /schedule/{groupId}:
     get:
       summary: schedule view
@@ -61,8 +78,6 @@ paths:
           required: true
           schema:
             type: string
-      # requestBody:
-      #   required: false
       responses:
         200:
           description: Success
@@ -129,6 +144,21 @@ components:
       required:
         - UserName
         - Password
+    GetGroups:
+      type: array
+      items:
+        $ref: "#/components/schemas/GroupItem"
+    GroupItem:
+      type: object
+      properties:
+        GroupUuid:
+          type: string
+          format: uuid
+        GroupName:
+          type: string
+      required:
+        - GroupUuid
+        - GroupName
     GetSchedule:
       type: array
       items:
