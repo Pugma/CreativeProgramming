@@ -68,6 +68,7 @@ impl Api for Count {
         'life0: 'async_trait,
         Self: 'async_trait,
     {
+        let copied_password: String = body.password.clone();
         let db_result: Result<bool, String> = tokio::task::block_in_place(move || {
             tokio::runtime::Handle::current().block_on(async move {
                 db::check_user(self.0.clone(), body.user_name, body.password).await
@@ -76,7 +77,10 @@ impl Api for Count {
 
         let result = match db_result {
             Ok(true) => Ok(LoginPostResponse::Status200_Success),
-            Ok(false) => Ok(LoginPostResponse::Status400_BadRequest),
+            Ok(false) => {
+                println!("password: {} is not correct", copied_password);
+                Ok(LoginPostResponse::Status400_BadRequest)
+            }
             Err(e) => {
                 println!("{}", e);
                 Ok(LoginPostResponse::Status400_BadRequest)

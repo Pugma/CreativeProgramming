@@ -2,6 +2,8 @@ pub mod db;
 pub mod handler;
 
 extern crate openapi;
+// use sqlx::migrate::Migrator;
+// use std::{path::Path, thread};
 use std::thread;
 use tower_http::services::{ServeDir, ServeFile};
 
@@ -21,10 +23,11 @@ async fn main() {
     .join()
     .expect("Thread panicked");
 
+    // let _m = Migrator::new(Path::new("./migrations")).await.unwrap();
+
     let state = Count(db_pool);
     let static_dir = ServeFile::new("/dist/index.html");
     let serve_dir_from_assets = ServeDir::new("/dist/assets/");
-    // let serve_dir_from_dist = ServeDir::new("dist");
 
     // 最初に初期化をする
     let app = openapi::server::new(state)
