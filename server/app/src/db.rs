@@ -78,6 +78,8 @@ pub async fn add_user(
 ) -> Result<MySqlQueryResult, String> {
     // Insert the task, then obtain the ID of this row
     let password = bcrypt::hash(password, bcrypt::DEFAULT_COST).unwrap();
+    println!("binary: {}, length: {}", password, password.len());
+
     // let password = format!("{:x}", hashed_password);
     let result = query("INSERT INTO `users` ( `userName`, `password` ) VALUES ( ?, ? )")
         .bind(user_name)
@@ -96,19 +98,17 @@ pub async fn check_user(
     user_name: String,
     password: String,
 ) -> Result<bool, String> {
-    let password = bcrypt::hash(password, bcrypt::DEFAULT_COST).unwrap();
-
     let correct_password =
         query_as::<_, Password>("SELECT `password` FROM `users` WHERE `userName`=?")
             .bind(user_name)
             .fetch_one(&pool)
-            .await
-            .unwrap();
+            .await;
 
-    let res = bcrypt::verify(password, correct_password.to_string());
-
-    match res {
-        Ok(r) => Ok(r),
+    match correct_password {
+        Ok(correct) => match bcrypt::verify(password, correct.to_string()) {
+            Ok(r) => Ok(r),
+            Err(e) => Err(e.to_string()),
+        },
         Err(e) => Err(e.to_string()),
     }
 }
