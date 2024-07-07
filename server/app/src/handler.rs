@@ -78,7 +78,7 @@ impl Api for Count {
             Ok(true) => Ok(LoginPostResponse::Status200_Success),
             Ok(false) => Ok(LoginPostResponse::Status400_BadRequest),
             Err(e) => {
-                println!("{}", e.to_string());
+                println!("{}", e);
                 Ok(LoginPostResponse::Status400_BadRequest)
             }
         };
