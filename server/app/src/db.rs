@@ -2,10 +2,12 @@ use once_cell::sync::Lazy;
 
 use sqlx::{
     mysql::{MySqlConnectOptions, MySqlPoolOptions, MySqlQueryResult},
-    query, query_as, MySql, Pool,
+    query, query_as, FromRow, MySql, Pool,
 };
 use std::env;
 use std::string::String;
+
+use openapi::models::GroupItem;
 
 pub struct DataBaseConfig {
     db_hostname: String,
@@ -15,13 +17,24 @@ pub struct DataBaseConfig {
     db_port: u16,
 }
 
-#[derive(sqlx::FromRow)]
-struct Password(String);
+#[derive(FromRow)]
+pub struct Password(String);
 
 impl Password {
     fn to_string(&self) -> &str {
-        let temp: &String = &self.0;
-        temp
+        &self.0
+    }
+}
+
+#[derive(FromRow)]
+struct DbGroupItem {
+    group_uuid: sqlx::types::Uuid,
+    group_name: String,
+}
+
+impl DbGroupItem {
+    fn to_group_item(&self) -> GroupItem {
+        GroupItem::new(self.group_uuid, self.group_name.clone())
     }
 }
 
@@ -97,5 +110,29 @@ pub async fn check_user(
     match res {
         Ok(r) => Ok(r),
         Err(e) => Err(e.to_string()),
+    }
+}
+
+pub async fn get_groups_by_user(
+    pool: Pool<MySql>,
+    user_name: String,
+) -> Result<Vec<GroupItem>, String> {
+    // TODO: テーブル結合を使いながらUUIDを返せるようなsqlを書く
+    let groups = query_as::<_, DbGroupItem>(
+        "SELECT `groupUuid`, `groupName` FROM `groups` JOIN `userGroup`",
+    )
+    .bind(user_name)
+    .fetch_all(&pool)
+    .await;
+
+    match groups {
+        Ok(groups) => {
+            let mut result_groups: Vec<GroupItem> = Vec::<GroupItem>::new();
+            for group in groups {
+                result_groups.push(group.to_group_item().clone());
+            }
+            Ok(result_groups)
+        }
+        Err(aaa) => Err(aaa.to_string()),
     }
 }
