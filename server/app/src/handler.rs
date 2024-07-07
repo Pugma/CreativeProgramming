@@ -1,16 +1,15 @@
 use axum_extra::extract::CookieJar;
 use core::{future::Future, marker, pin};
-// use openapi::Api;
 use sqlx::{mysql::MySqlQueryResult, MySql, Pool};
 
-use crate::db;
+use crate::db::{self};
 use axum::async_trait;
 use openapi::{
     models::{
-        PostLogin, ScheduleGroupIdGetPathParams, ScheduleGroupIdPostPathParams,
+        GroupItem, PostLogin, ScheduleGroupIdGetPathParams, ScheduleGroupIdPostPathParams,
         ScheduleGroupIdPutPathParams, ScheduleItem,
     },
-    Api, LoginPostResponse, ScheduleGroupIdGetResponse, ScheduleGroupIdPostResponse,
+    Api, LoginPostResponse, MeGetResponse, ScheduleGroupIdGetResponse, ScheduleGroupIdPostResponse,
     ScheduleGroupIdPutResponse, SignUpPostResponse,
 };
 
@@ -78,6 +77,33 @@ impl Api for Count {
             Ok(true) => Ok(LoginPostResponse::Status200_Success),
             Ok(false) => Ok(LoginPostResponse::Status400_BadRequest),
             _ => Err(aaa),
+        };
+
+        Box::pin(async { result })
+    }
+
+    fn me_get<'life0, 'async_trait>(
+        &'life0 self,
+        _method: axum::http::Method,
+        _host: axum::extract::Host,
+        _cookies: CookieJar,
+    ) -> pin::Pin<
+        Box<dyn Future<Output = Result<MeGetResponse, String>> + marker::Send + 'async_trait>,
+    >
+    where
+        'life0: 'async_trait,
+        Self: 'async_trait,
+    {
+        let user_name: String = "".to_string();
+
+        let db_result: Result<Vec<GroupItem>, String> = tokio::task::block_in_place(move || {
+            tokio::runtime::Handle::current()
+                .block_on(async move { db::get_groups_by_user(self.0.clone(), user_name).await })
+        });
+
+        let result = match db_result {
+            Ok(result) => Ok(MeGetResponse::Status200_Success(result)),
+            Err(e) => Err(e),
         };
 
         Box::pin(async { result })
