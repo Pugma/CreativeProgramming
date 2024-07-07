@@ -45,7 +45,10 @@ impl Api for Count {
 
         let result = match db_result {
             Ok(_) => Ok(SignUpPostResponse::Status200_Success),
-            _ => Ok(SignUpPostResponse::Status400_BadRequest),
+            Err(a) => {
+                println!("{}", a);
+                Ok(SignUpPostResponse::Status400_BadRequest)
+            }
         };
 
         println!("Login requested");
@@ -71,12 +74,13 @@ impl Api for Count {
             })
         });
 
-        let aaa = "aaaa".to_string();
-
         let result = match db_result {
             Ok(true) => Ok(LoginPostResponse::Status200_Success),
             Ok(false) => Ok(LoginPostResponse::Status400_BadRequest),
-            _ => Err(aaa),
+            Err(e) => {
+                println!("{}", e);
+                Ok(LoginPostResponse::Status400_BadRequest)
+            }
         };
 
         Box::pin(async { result })
