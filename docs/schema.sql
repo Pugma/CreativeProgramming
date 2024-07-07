@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `users`(
     `userId` INT(11) NOT NULL AUTO_INCREMENT,
     `userName` VARCHAR(50) NOT NULL UNIQUE,
-    `password` BINARY(32) NOT NULL,
+    `password` VARCHAR(60) NOT NULL,
     PRIMARY KEY (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
