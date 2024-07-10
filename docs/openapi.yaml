@@ -71,6 +71,11 @@ paths:
   /group:
     post:
       summary: make group
+      tags:
+        - group
+      responses:
+        200:
+          description: Success
 
   /schedule/{groupId}:
     get:
