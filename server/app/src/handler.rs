@@ -1,8 +1,8 @@
 use axum_extra::extract::CookieJar;
 use core::{future::Future, marker, pin};
-use sqlx::{mysql::MySqlQueryResult, MySql, Pool};
+use sqlx::mysql::MySqlQueryResult;
 
-use crate::db::{self};
+use crate::repository::Repository;
 use axum::async_trait;
 use openapi::{
     models::{
@@ -13,17 +13,8 @@ use openapi::{
     ScheduleGroupIdPutResponse, SignUpPostResponse,
 };
 
-#[derive(Clone)]
-pub struct Count(pub Pool<MySql>);
-
-impl AsRef<Count> for Count {
-    fn as_ref(&self) -> &Count {
-        self
-    }
-}
-
 #[async_trait]
-impl Api for Count {
+impl Api for Repository {
     fn sign_up_post<'life0, 'async_trait>(
         &'life0 self,
         _method: axum::http::Method,
@@ -38,9 +29,8 @@ impl Api for Count {
         Self: 'async_trait,
     {
         let db_result: Result<MySqlQueryResult, String> = tokio::task::block_in_place(move || {
-            tokio::runtime::Handle::current().block_on(async move {
-                db::add_user(self.0.clone(), body.user_name, body.password).await
-            })
+            tokio::runtime::Handle::current()
+                .block_on(async move { self.add_user(body.user_name, body.password).await })
         });
 
         let result = match db_result {
@@ -70,9 +60,8 @@ impl Api for Count {
     {
         let copied_password: String = body.password.clone();
         let db_result: Result<bool, String> = tokio::task::block_in_place(move || {
-            tokio::runtime::Handle::current().block_on(async move {
-                db::check_user(self.0.clone(), body.user_name, body.password).await
-            })
+            tokio::runtime::Handle::current()
+                .block_on(async move { self.check_user(body.user_name, body.password).await })
         });
 
         let result = match db_result {
@@ -106,7 +95,7 @@ impl Api for Count {
 
         let db_result: Result<Vec<GroupItem>, String> = tokio::task::block_in_place(move || {
             tokio::runtime::Handle::current()
-                .block_on(async move { db::get_groups_by_user(self.0.clone(), user_name).await })
+                .block_on(async move { self.get_groups_by_user(user_name).await })
         });
 
         let result = match db_result {
