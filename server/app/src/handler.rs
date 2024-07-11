@@ -9,8 +9,8 @@ use openapi::{
         GroupItem, PostLogin, ScheduleGroupIdGetPathParams, ScheduleGroupIdPostPathParams,
         ScheduleGroupIdPutPathParams, ScheduleItem,
     },
-    Api, LoginPostResponse, MeGetResponse, ScheduleGroupIdGetResponse, ScheduleGroupIdPostResponse,
-    ScheduleGroupIdPutResponse, SignUpPostResponse,
+    Api, GroupPostResponse, LoginPostResponse, MeGetResponse, ScheduleGroupIdGetResponse,
+    ScheduleGroupIdPostResponse, ScheduleGroupIdPutResponse, SignUpPostResponse,
 };
 
 #[async_trait]
@@ -34,7 +34,7 @@ impl Api for Repository {
         });
 
         let result = match db_result {
-            Ok(_) => Ok(SignUpPostResponse::Status200_Success),
+            core::result::Result::Ok(_) => Ok(SignUpPostResponse::Status200_Success),
             Err(a) => {
                 println!("{}", a);
                 Ok(SignUpPostResponse::Status400_BadRequest)
@@ -104,6 +104,15 @@ impl Api for Repository {
         };
 
         Box::pin(async { result })
+    }
+
+    async fn group_post(
+        &self,
+        _method: axum::http::Method,
+        _host: axum::extract::Host,
+        _cookies: CookieJar,
+    ) -> Result<GroupPostResponse, String> {
+        Ok(GroupPostResponse::Status200_Success)
     }
 
     fn schedule_group_id_get<'life0, 'async_trait>(
