@@ -13,6 +13,8 @@ tags:
     description: related to authentication
   - name: user
     description: related to user data
+  - name: group
+    description: related to group
   - name: schedule
     description: related to scheduling
 
@@ -65,6 +67,15 @@ paths:
                 $ref: "#/components/schemas/GetGroups"
         401:
           description: Not authorized
+
+  /group:
+    post:
+      summary: make group
+      tags:
+        - group
+      responses:
+        200:
+          description: Success
 
   /schedule/{groupId}:
     get:
