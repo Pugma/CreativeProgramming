@@ -12,7 +12,7 @@ use repository::Repository;
 async fn main() -> anyhow::Result<()> {
     // DB 初期化
     let state = Repository::setup_db().await?;
-    state.migrate().await?;
+    // state.migrate().await?;
 
     // 静的ファイル配信設定
     let static_dir = ServeFile::new("/dist/index.html");

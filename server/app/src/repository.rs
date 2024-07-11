@@ -8,7 +8,7 @@ use sqlx::{FromRow, MySqlPool};
 use std::env;
 use std::string::String;
 
-const MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("../../docs");
+// const MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("../../docs");
 
 use async_sqlx_session::MySqlSessionStore;
 use openapi::models::GroupItem;
@@ -40,11 +40,11 @@ impl Repository {
         })
     }
 
-    pub async fn migrate(&self) -> anyhow::Result<()> {
-        MIGRATOR.run(&self.pool).await?;
-        self.session_store.migrate().await?;
-        Ok(())
-    }
+    // pub async fn migrate(&self) -> anyhow::Result<()> {
+    //     MIGRATOR.run(&self.pool).await?;
+    //     self.session_store.migrate().await?;
+    //     Ok(())
+    // }
 }
 
 impl AsRef<Repository> for Repository {
