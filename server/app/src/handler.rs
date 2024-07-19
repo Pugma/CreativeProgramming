@@ -34,7 +34,9 @@ impl Api for Repository {
         });
 
         let result = match db_result {
-            core::result::Result::Ok(_) => Ok(SignUpPostResponse::Status200_Success),
+            core::result::Result::Ok(_) => {
+                Ok(SignUpPostResponse::Status200_Success { set_cookie: Some("".to_string()) })
+            }
             Err(a) => {
                 println!("{}", a);
                 Ok(SignUpPostResponse::Status400_BadRequest)
@@ -65,7 +67,9 @@ impl Api for Repository {
         });
 
         let result = match db_result {
-            Ok(true) => Ok(LoginPostResponse::Status200_Success),
+            Ok(true) => Ok(LoginPostResponse::Status200_Success {
+                set_cookie: (Some("".to_string())),
+            }),
             Ok(false) => {
                 println!("password: {} is not correct", copied_password);
                 Ok(LoginPostResponse::Status400_BadRequest)
