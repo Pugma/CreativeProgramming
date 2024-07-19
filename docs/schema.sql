@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `groups` (
     `groupId` INT(11) NOT NULL AUTO_INCREMENT,
     `groupUuid` VARCHAR(32) NOT NULL,
     `groupName` VARCHAR(32) NOT NULL,
-    `userName` VARCHAR(50) NOT NULL,
+    `ownerName` VARCHAR(50) NOT NULL,
     `lastUpdate` DATETIME NOT NULL,
     PRIMARY KEY (`groupId`),
     INDEX (`lastUpdate`)
