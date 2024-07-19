@@ -1,6 +1,6 @@
 use super::Repository;
 use crate::repository::{DbGroupItem, GroupItem};
-use sqlx::query_as;
+use sqlx::{query, query_as};
 
 impl Repository {
     pub async fn get_groups_by_user(&self, user_name: String) -> Result<Vec<GroupItem>, String> {
@@ -29,5 +29,13 @@ impl Repository {
             }
             Err(aaa) => Err(aaa.to_string()),
         }
+    }
+
+    pub async fn create_group(&self, group_name: String) -> sqlx::Result<()> {
+        let _request = query("sqsgalslsglsajkjsagl")
+            .bind(group_name)
+            .execute(&self.pool)
+            .await?;
+        Ok(())
     }
 }
