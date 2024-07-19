@@ -33,6 +33,11 @@ paths:
       responses:
         200:
           description: Success
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: session_id=abcde12345; Path=/; HttpOnly
         400:
           description: Bad request
 
@@ -50,6 +55,11 @@ paths:
       responses:
         200:
           description: Success
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: session_id=abcde12345; Path=/; HttpOnly
         400:
           description: Bad request
 
@@ -73,6 +83,12 @@ paths:
       summary: make group
       tags:
         - group
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostGroup"
       responses:
         200:
           description: Success
@@ -155,6 +171,13 @@ components:
       required:
         - UserName
         - Password
+    PostGroup:
+      type: object
+      properties:
+        GroupName:
+          type: string
+      required:
+        - GroupName
     GetGroups:
       type: array
       items:
@@ -192,3 +215,10 @@ components:
         - Since
         - Until
         - Condition
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session_id
+security:
+  - cookieAuth: []
