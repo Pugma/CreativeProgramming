@@ -34,9 +34,9 @@ impl Api for Repository {
         });
 
         let result = match db_result {
-            core::result::Result::Ok(_) => {
-                Ok(SignUpPostResponse::Status200_Success { set_cookie: Some("".to_string()) })
-            }
+            core::result::Result::Ok(_) => Ok(SignUpPostResponse::Status200_Success {
+                set_cookie: Some("".to_string()),
+            }),
             Err(a) => {
                 println!("{}", a);
                 Ok(SignUpPostResponse::Status400_BadRequest)
