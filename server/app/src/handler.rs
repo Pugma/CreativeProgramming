@@ -34,7 +34,9 @@ impl Api for Repository {
         });
 
         let result = match db_result {
-            core::result::Result::Ok(_) => Ok(SignUpPostResponse::Status200_Success),
+            core::result::Result::Ok(_) => Ok(SignUpPostResponse::Status200_Success {
+                set_cookie: Some("".to_string()),
+            }),
             Err(a) => {
                 println!("{}", a);
                 Ok(SignUpPostResponse::Status400_BadRequest)
@@ -65,7 +67,9 @@ impl Api for Repository {
         });
 
         let result = match db_result {
-            Ok(true) => Ok(LoginPostResponse::Status200_Success),
+            Ok(true) => Ok(LoginPostResponse::Status200_Success {
+                set_cookie: (Some("".to_string())),
+            }),
             Ok(false) => {
                 println!("password: {} is not correct", copied_password);
                 Ok(LoginPostResponse::Status400_BadRequest)
@@ -106,13 +110,29 @@ impl Api for Repository {
         Box::pin(async { result })
     }
 
-    async fn group_post(
-        &self,
+    fn group_post<'life0, 'async_trait>(
+        &'life0 self,
         _method: axum::http::Method,
         _host: axum::extract::Host,
         _cookies: CookieJar,
-    ) -> Result<GroupPostResponse, String> {
-        Ok(GroupPostResponse::Status200_Success)
+        body: openapi::models::PostGroup,
+    ) -> core::pin::Pin<
+        Box<
+            dyn Future<Output = Result<GroupPostResponse, String>>
+                + core::marker::Send
+                + 'async_trait,
+        >,
+    >
+    where
+        'life0: 'async_trait,
+        Self: 'async_trait,
+    {
+        let _db_result: Result<(), sqlx::Error> = tokio::task::block_in_place(move || {
+            tokio::runtime::Handle::current()
+                .block_on(async move { self.create_group(body.group_name).await })
+        });
+
+        Box::pin(async { Ok(GroupPostResponse::Status200_Success) })
     }
 
     fn schedule_group_id_get<'life0, 'async_trait>(
