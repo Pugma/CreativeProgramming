@@ -1,12 +1,11 @@
 use axum_extra::extract::CookieJar;
-use core::{future::Future, marker, pin};
-use sqlx::mysql::MySqlQueryResult;
+use core::result::Result;
 
 use crate::repository::Repository;
 use axum::async_trait;
 use openapi::{
     models::{
-        GroupItem, PostLogin, ScheduleGroupIdGetPathParams, ScheduleGroupIdPostPathParams,
+        PostLogin, ScheduleGroupIdGetPathParams, ScheduleGroupIdPostPathParams,
         ScheduleGroupIdPutPathParams, ScheduleItem,
     },
     Api, GroupPostResponse, LoginPostResponse, MeGetResponse, ScheduleGroupIdGetResponse,
@@ -15,58 +14,43 @@ use openapi::{
 
 #[async_trait]
 impl Api for Repository {
-    fn sign_up_post<'life0, 'async_trait>(
-        &'life0 self,
+    async fn sign_up_post(
+        &self,
         _method: axum::http::Method,
         _host: axum::extract::Host,
         _cookies: CookieJar,
         body: PostLogin,
-    ) -> pin::Pin<
-        Box<dyn Future<Output = Result<SignUpPostResponse, String>> + marker::Send + 'async_trait>,
-    >
-    where
-        'life0: 'async_trait,
-        Self: 'async_trait,
-    {
-        let db_result: Result<MySqlQueryResult, String> = tokio::task::block_in_place(move || {
-            tokio::runtime::Handle::current()
-                .block_on(async move { self.add_user(body.user_name, body.password).await })
-        });
+    ) -> Result<SignUpPostResponse, String> {
+        self.add_user(body.user_name.clone(), body.password).await?;
 
-        let result = match db_result {
-            core::result::Result::Ok(_) => Ok(SignUpPostResponse::Status200_Success {
-                set_cookie: Some("".to_string()),
-            }),
-            Err(a) => {
-                println!("{}", a);
-                Ok(SignUpPostResponse::Status400_BadRequest)
+        let user_session = match self.create_session_for_user(body.user_name).await {
+            Ok(session) => session,
+            Err(e) => {
+                println!("error: {}", e);
+                "".to_string()
             }
         };
 
+        let result = Ok(SignUpPostResponse::Status200_Success {
+            set_cookie: Some(user_session),
+        });
+
         println!("Login requested");
 
-        Box::pin(async { result })
+        result
     }
-    fn login_post<'life0, 'async_trait>(
-        &'life0 self,
+
+    async fn login_post(
+        &self,
         _method: axum::http::Method,
         _host: axum::extract::Host,
         _cookies: CookieJar,
         body: PostLogin,
-    ) -> pin::Pin<
-        Box<dyn Future<Output = Result<LoginPostResponse, String>> + marker::Send + 'async_trait>,
-    >
-    where
-        'life0: 'async_trait,
-        Self: 'async_trait,
-    {
+    ) -> Result<LoginPostResponse, String> {
         let copied_password: String = body.password.clone();
-        let db_result: Result<bool, String> = tokio::task::block_in_place(move || {
-            tokio::runtime::Handle::current()
-                .block_on(async move { self.check_user(body.user_name, body.password).await })
-        });
+        let db_result: Result<bool, String> = self.check_user(body.user_name, body.password).await;
 
-        let result = match db_result {
+        match db_result {
             Ok(true) => Ok(LoginPostResponse::Status200_Success {
                 set_cookie: (Some("".to_string())),
             }),
@@ -78,80 +62,47 @@ impl Api for Repository {
                 println!("{}", e);
                 Ok(LoginPostResponse::Status400_BadRequest)
             }
-        };
-
-        Box::pin(async { result })
+        }
     }
 
-    fn me_get<'life0, 'async_trait>(
-        &'life0 self,
+    async fn me_get(
+        &self,
         _method: axum::http::Method,
         _host: axum::extract::Host,
-        _cookies: CookieJar,
-    ) -> pin::Pin<
-        Box<dyn Future<Output = Result<MeGetResponse, String>> + marker::Send + 'async_trait>,
-    >
-    where
-        'life0: 'async_trait,
-        Self: 'async_trait,
-    {
-        let user_name: String = "".to_string();
+        cookies: CookieJar,
+    ) -> Result<MeGetResponse, String> {
+        let user_session = cookies.get("user_session").unwrap().value();
 
-        let db_result: Result<Vec<GroupItem>, String> = tokio::task::block_in_place(move || {
-            tokio::runtime::Handle::current()
-                .block_on(async move { self.get_groups_by_user(user_name).await })
-        });
+        let user_name = self
+            .load_session_from_cookie(user_session)
+            .await
+            .unwrap()
+            .unwrap();
 
-        let result = match db_result {
-            Ok(result) => Ok(MeGetResponse::Status200_Success(result)),
-            Err(e) => Err(e),
-        };
+        let db_result = self.get_groups_by_user(user_name).await?;
 
-        Box::pin(async { result })
+        Ok(MeGetResponse::Status200_Success(db_result))
     }
 
-    fn group_post<'life0, 'async_trait>(
-        &'life0 self,
+    async fn group_post(
+        &self,
         _method: axum::http::Method,
         _host: axum::extract::Host,
         _cookies: CookieJar,
         body: openapi::models::PostGroup,
-    ) -> core::pin::Pin<
-        Box<
-            dyn Future<Output = Result<GroupPostResponse, String>>
-                + core::marker::Send
-                + 'async_trait,
-        >,
-    >
-    where
-        'life0: 'async_trait,
-        Self: 'async_trait,
-    {
-        let _db_result: Result<(), sqlx::Error> = tokio::task::block_in_place(move || {
-            tokio::runtime::Handle::current()
-                .block_on(async move { self.create_group(body.group_name).await })
-        });
+    ) -> Result<GroupPostResponse, String> {
+        let _db_result = self.create_group(body.group_name).await;
 
-        Box::pin(async { Ok(GroupPostResponse::Status200_Success) })
+        Ok(GroupPostResponse::Status200_Success)
     }
 
-    fn schedule_group_id_get<'life0, 'async_trait>(
-        &'life0 self,
+    async fn schedule_group_id_get(
+        &self,
         _method: axum::http::Method,
         _host: axum::extract::Host,
         _cookies: CookieJar,
         path_params: ScheduleGroupIdGetPathParams,
-    ) -> pin::Pin<
-        Box<
-            dyn Future<Output = Result<ScheduleGroupIdGetResponse, String>>
-                + marker::Send
-                + 'async_trait,
-        >,
-    >
-    where
-        'life0: 'async_trait,
-        Self: 'async_trait,
-    {
+    ) -> Result<ScheduleGroupIdGetResponse, String> {
         let aaa = "Stringにしたいんだが！？".to_string();
         let bbb: Vec<ScheduleItem> = vec![];
 
@@ -160,27 +111,17 @@ impl Api for Repository {
             _ => Err(aaa),
         };
 
-        Box::pin(async { result })
+        result
     }
 
-    fn schedule_group_id_post<'life0, 'async_trait>(
-        &'life0 self,
+    async fn schedule_group_id_post(
+        &self,
         _method: axum::http::Method,
         _host: axum::extract::Host,
         _cookies: CookieJar,
         _path_params: ScheduleGroupIdPostPathParams,
         body: ScheduleItem,
-    ) -> pin::Pin<
-        Box<
-            dyn Future<Output = Result<ScheduleGroupIdPostResponse, String>>
-                + marker::Send
-                + 'async_trait,
-        >,
-    >
-    where
-        'life0: 'async_trait,
-        Self: 'async_trait,
-    {
+    ) -> Result<ScheduleGroupIdPostResponse, String> {
         let aaa = "Stringにしたいんだが！？".to_string();
 
         let result = match body.user_name.as_str() {
@@ -188,27 +129,17 @@ impl Api for Repository {
             _ => Err(aaa),
         };
 
-        Box::pin(async { result })
+        result
     }
 
-    fn schedule_group_id_put<'life0, 'async_trait>(
-        &'life0 self,
+    async fn schedule_group_id_put(
+        &self,
         _method: axum::http::Method,
         _host: axum::extract::Host,
         _cookies: CookieJar,
         _path_params: ScheduleGroupIdPutPathParams,
         body: ScheduleItem,
-    ) -> pin::Pin<
-        Box<
-            dyn Future<Output = Result<ScheduleGroupIdPutResponse, String>>
-                + marker::Send
-                + 'async_trait,
-        >,
-    >
-    where
-        'life0: 'async_trait,
-        Self: 'async_trait,
-    {
+    ) -> Result<ScheduleGroupIdPutResponse, String> {
         let aaa = "Stringにしたいんだが！？".to_string();
 
         let result = match body.user_name.as_str() {
@@ -216,6 +147,6 @@ impl Api for Repository {
             _ => Err(aaa),
         };
 
-        Box::pin(async { result })
+        result
     }
 }
