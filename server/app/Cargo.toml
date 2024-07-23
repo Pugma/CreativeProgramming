@@ -16,7 +16,7 @@ uuid = { version = "1.8.0", features = ["v7"] }
 tower-http = {version = "0.5.2", features = ["fs"]}
 bcrypt = "0.15.1"
 async-session = "3.0.0"
-anyhow = "1.0.86"
+anyhow = {version = "1.0.86", features = ["backtrace"]}
 serde = "1.0.204"
 
 [dependencies.async-sqlx-session]
