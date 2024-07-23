@@ -28,6 +28,8 @@ WORKDIR /app/server
 
 COPY --from=client /app/server .
 
+RUN cargo fetch
+
 RUN cargo build --release
 
 # 最終的な配信用
@@ -38,5 +40,7 @@ WORKDIR /
 COPY --from=client /app/client/dist dist
 
 COPY --from=server /app/server/target/release/app app
+
+ENV RUST_BACKTRACE=full
 
 ENTRYPOINT [ "./app" ]
