@@ -109,7 +109,7 @@ static CONFIG: Lazy<DataBaseConfig> = Lazy::new(|| DataBaseConfig {
 pub struct UserName(String);
 
 impl UserName {
-    fn to_string(&self) -> String {
+    fn get_string(&self) -> String {
         self.0.clone()
     }
 }

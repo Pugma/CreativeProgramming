@@ -4,7 +4,7 @@ use sqlx::{query, query_as};
 
 impl Repository {
     pub async fn get_groups_by_user(&self, user_name: UserName) -> Result<Vec<GroupItem>, String> {
-        let user_name: String = user_name.to_string();
+        let user_name: String = user_name.get_string();
 
         // TODO: テーブル結合を使いながらUUIDを返せるようなsqlを書く
         let groups = query_as::<_, DbGroupItem>(
