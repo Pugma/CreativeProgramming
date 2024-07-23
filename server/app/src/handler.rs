@@ -50,8 +50,6 @@ impl Api for Repository {
         let copied_password: String = body.password.clone();
         let db_result: Result<bool, String> = self.check_user(body.user_name, body.password).await;
 
-        
-
         match db_result {
             Ok(true) => Ok(LoginPostResponse::Status200_Success {
                 set_cookie: (Some("".to_string())),
