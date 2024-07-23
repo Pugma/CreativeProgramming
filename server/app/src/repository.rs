@@ -31,8 +31,12 @@ impl Repository {
             .max_connections(10)
             .connect_with(CONFIG.options())
             .await?;
+
         let session_store =
             MySqlSessionStore::from_client(pool.clone()).with_table_name("user_sessions");
+
+        session_store.migrate().await?;
+
         Ok(Self {
             pool,
             session_store,
@@ -103,3 +107,9 @@ static CONFIG: Lazy<DataBaseConfig> = Lazy::new(|| DataBaseConfig {
 
 #[derive(FromRow, Deserialize, Serialize)]
 pub struct UserName(String);
+
+impl UserName {
+    fn get_string(&self) -> String {
+        self.0.clone()
+    }
+}
