@@ -1,152 +1,200 @@
-use axum_extra::extract::CookieJar;
-use core::result::Result;
-
 use crate::repository::Repository;
-use axum::async_trait;
+use axum::http::Method;
+use axum::{
+    body::Body,
+    extract::{Host, Path, State},
+    response::Response,
+    Json,
+};
+use axum_extra::extract::CookieJar;
+use openapi::models::PostGroup;
 use openapi::{
-    models::{
-        PostLogin, ScheduleGroupIdGetPathParams, ScheduleGroupIdPostPathParams,
-        ScheduleGroupIdPutPathParams, ScheduleItem,
-    },
-    Api, GroupPostResponse, LoginPostResponse, MeGetResponse, ScheduleGroupIdGetResponse,
-    ScheduleGroupIdPostResponse, ScheduleGroupIdPutResponse, SignUpPostResponse,
+    models::{PostLogin, ScheduleGroupIdGetPathParams, ScheduleItem},
+    LoginPostResponse, ScheduleGroupIdPostResponse, ScheduleGroupIdPutResponse,
 };
 
-#[async_trait]
-impl Api for Repository {
-    async fn sign_up_post(
-        &self,
-        _method: axum::http::Method,
-        _host: axum::extract::Host,
-        _cookies: CookieJar,
-        body: PostLogin,
-    ) -> Result<SignUpPostResponse, String> {
-        self.add_user(body.user_name.clone(), body.password).await?;
+use crate::errors::Result;
 
-        let user_session = match self.create_session_for_user(body.user_name).await {
-            Ok(session) => session,
-            Err(e) => {
-                println!("error: {}", e);
-                "".to_string()
-            }
-        };
+// #[debug_handler]
+pub async fn sign_up_post(
+    _method: Method,
+    _host: Host,
+    _cookies: CookieJar,
+    State(repo): State<Repository>,
+    Json(body): Json<PostLogin>,
+) -> Result<Response> {
+    repo.add_user(body.user_name.clone(), body.password.clone())
+        .await?;
 
-        let result = Ok(SignUpPostResponse::Status200_Success {
-            set_cookie: Some(user_session),
-        });
-
-        println!("Login requested");
-
-        result
-    }
-
-    async fn login_post(
-        &self,
-        _method: axum::http::Method,
-        _host: axum::extract::Host,
-        _cookies: CookieJar,
-        body: PostLogin,
-    ) -> Result<LoginPostResponse, String> {
-        let copied_password: String = body.password.clone();
-        let db_result: Result<bool, String> = self.check_user(body.user_name, body.password).await;
-
-        match db_result {
-            Ok(true) => Ok(LoginPostResponse::Status200_Success {
-                set_cookie: (Some("".to_string())),
-            }),
-            Ok(false) => {
-                println!("password: {} is not correct", copied_password);
-                Ok(LoginPostResponse::Status400_BadRequest)
-            }
-            Err(e) => {
-                println!("{}", e);
-                Ok(LoginPostResponse::Status400_BadRequest)
-            }
+    let _user_session = match repo.create_session_for_user(body.user_name.clone()).await {
+        Ok(session) => session,
+        Err(e) => {
+            println!("error: {}", e);
+            "".to_string()
         }
-    }
+    };
 
-    async fn me_get(
-        &self,
-        _method: axum::http::Method,
-        _host: axum::extract::Host,
-        cookies: CookieJar,
-    ) -> Result<MeGetResponse, String> {
-        let user_session = cookies.get("user_session").unwrap().value();
+    println!("Login requested");
 
-        let user_name = self
-            .load_session_from_cookie(user_session)
-            .await
-            .unwrap()
-            .unwrap();
+    let response = Response::builder();
 
-        let db_result = self.get_groups_by_user(user_name).await?;
+    let rep = response.status(200).body(Body::empty()).unwrap();
+    Ok(rep)
+}
 
-        Ok(MeGetResponse::Status200_Success(db_result))
-    }
+pub async fn login_post(
+    _method: Method,
+    _host: Host,
+    _cookies: CookieJar,
+    State(repo): State<Repository>,
+    Json(body): Json<PostLogin>,
+) -> Result<Response> {
+    let copied_password: String = body.password.clone();
+    let db_result: Result<bool, String> = repo.check_user(body.user_name, body.password).await;
 
-    async fn group_post(
-        &self,
-        _method: axum::http::Method,
-        _host: axum::extract::Host,
-        _cookies: CookieJar,
-        body: openapi::models::PostGroup,
-    ) -> Result<GroupPostResponse, String> {
-        let _db_result = self.create_group(body.group_name).await;
+    let _result = match db_result {
+        Ok(true) => Ok(LoginPostResponse::Status200_Success),
+        Ok(false) => {
+            println!("password: {} is not correct", copied_password);
+            Ok(LoginPostResponse::Status400_BadRequest)
+        }
+        Err(e) => Err(e),
+    };
 
-        Ok(GroupPostResponse::Status200_Success)
-    }
+    let response = Response::builder();
 
-    async fn schedule_group_id_get(
-        &self,
-        _method: axum::http::Method,
-        _host: axum::extract::Host,
-        _cookies: CookieJar,
-        path_params: ScheduleGroupIdGetPathParams,
-    ) -> Result<ScheduleGroupIdGetResponse, String> {
-        let aaa = "Stringにしたいんだが！？".to_string();
-        let bbb: Vec<ScheduleItem> = vec![];
+    // let resp = match result {
+    //     Ok(rsp) => match rsp {
+    //         LoginPostResponse::Status200_Success => {
+    //             if let Some(set_cookie) = set_cookie {
+    //                 let set_cookie = match header::IntoHeaderValue(set_cookie).try_into() {
+    //                     Ok(val) => val,
+    //                     Err(e) => {
+    //                         return Response::builder()
+    //                                                                 .status(StatusCode::INTERNAL_SERVER_ERROR)
+    //                                                                 .body(Body::from(format!("An internal server error occurred handling set_cookie header - {}", e))).map_err(|e| { error!(error = ?e); StatusCode::INTERNAL_SERVER_ERROR });
+    //                     }
+    //                 };
 
-        let result = match path_params.group_id.as_str() {
-            "_aaa" => Ok(ScheduleGroupIdGetResponse::Status200_Success(bbb)),
-            _ => Err(aaa),
-        };
+    //                 {
+    //                     let mut response_headers = response.headers_mut().unwrap();
+    //                     response_headers.insert(HeaderName::from_static(""), set_cookie);
+    //                 }
+    //             }
 
-        result
-    }
+    //             let mut response = response.status(200);
+    //             response.body(Body::empty())
+    //         }
+    //         LoginPostResponse::Status400_BadRequest => {
+    //             let mut response = response.status(400);
+    //             response.body(Body::empty())
+    //         }
+    //     },
+    //     Err(_) => {
+    //         // Application code returned an error. This should not happen, as the implementation should
+    //         // return a valid response.
+    //         response.status(500).body(Body::empty())
+    //     }
+    // };
 
-    async fn schedule_group_id_post(
-        &self,
-        _method: axum::http::Method,
-        _host: axum::extract::Host,
-        _cookies: CookieJar,
-        _path_params: ScheduleGroupIdPostPathParams,
-        body: ScheduleItem,
-    ) -> Result<ScheduleGroupIdPostResponse, String> {
-        let aaa = "Stringにしたいんだが！？".to_string();
+    let rep = response.status(200).body(Body::empty()).unwrap();
+    Ok(rep)
+}
 
-        let result = match body.user_name.as_str() {
-            "_aaa" => Ok(ScheduleGroupIdPostResponse::Status200_Success),
-            _ => Err(aaa),
-        };
+pub async fn me_get(
+    _method: Method,
+    _host: Host,
+    cookies: CookieJar,
+    State(repo): State<Repository>,
+    Json(_body): Json<PostLogin>,
+) -> crate::Result<Response> {
+    let user_session = cookies.get("user_session").unwrap().value();
 
-        result
-    }
+    let user_name = repo
+        .load_session_from_cookie(user_session)
+        .await
+        .unwrap()
+        .unwrap();
 
-    async fn schedule_group_id_put(
-        &self,
-        _method: axum::http::Method,
-        _host: axum::extract::Host,
-        _cookies: CookieJar,
-        _path_params: ScheduleGroupIdPutPathParams,
-        body: ScheduleItem,
-    ) -> Result<ScheduleGroupIdPutResponse, String> {
-        let aaa = "Stringにしたいんだが！？".to_string();
+    let _db_result = repo.get_groups_by_user(user_name).await.unwrap();
 
-        let result = match body.user_name.as_str() {
-            "_aaa" => Ok(ScheduleGroupIdPutResponse::Status200_Success),
-            _ => Err(aaa),
-        };
+    let response = Response::builder();
+    let rep = response.status(200).body(Body::empty()).unwrap();
+    Ok(rep)
+}
 
-        result
-    }
+pub async fn group_post(
+    _method: Method,
+    _host: Host,
+    _cookies: CookieJar,
+    State(repo): State<Repository>,
+    Json(body): Json<PostGroup>,
+) -> crate::Result<Response> {
+    let _db_result = repo.create_group(body.group_name).await;
+
+    let response = Response::builder();
+    let rep = response.status(200).body(Body::empty()).unwrap();
+    Ok(rep)
+}
+
+pub async fn schedule_group_id_get(
+    _method: Method,
+    _host: Host,
+    _cookies: CookieJar,
+    Path(_path_params): Path<ScheduleGroupIdGetPathParams>,
+    State(_repo): State<Repository>,
+    // Json(body): Json<Sched>,
+) -> crate::Result<Response> {
+    // let user_name: UserName = UserName("".to_string());
+    let _aaa = "Stringにしたいんだが！？".to_string();
+    let _bbb: Vec<ScheduleItem> = vec![];
+
+    // let a = _repo.(_path_params.group_id).await.unwrap();
+
+    // let result = match path_params.group_id.as_str() {
+    //     "_aaa" => Ok(ScheduleGroupIdGetResponse::Status200_Success(bbb)),
+    //     _ => Err(aaa),
+    // };
+
+    let response = Response::builder();
+    let rep = response.status(200).body(Body::empty()).unwrap();
+    Ok(rep)
+}
+
+pub async fn schedule_group_id_post(
+    _method: Method,
+    _host: Host,
+    _cookies: CookieJar,
+    State(_repo): State<Repository>,
+    Json(body): Json<PostLogin>,
+) -> crate::Result<Response> {
+    let aaa = "Stringにしたいんだが！？".to_string();
+
+    let _result = match body.user_name.as_str() {
+        "_aaa" => Ok(ScheduleGroupIdPostResponse::Status200_Success),
+        _ => Err(aaa),
+    };
+
+    let response = Response::builder();
+    let rep = response.status(200).body(Body::empty()).unwrap();
+    Ok(rep)
+}
+
+pub async fn schedule_group_id_put(
+    _method: Method,
+    _host: Host,
+    _cookies: CookieJar,
+    State(_repo): State<Repository>,
+    Json(body): Json<PostLogin>,
+) -> crate::Result<Response> {
+    let aaa = "Stringにしたいんだが！？".to_string();
+
+    let _result = match body.user_name.as_str() {
+        "_aaa" => Ok(ScheduleGroupIdPutResponse::Status200_Success),
+        _ => Err(aaa),
+    };
+
+    let response = Response::builder();
+    let rep = response.status(200).body(Body::empty()).unwrap();
+    Ok(rep)
 }
