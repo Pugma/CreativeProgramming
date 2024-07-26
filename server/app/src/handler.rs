@@ -9,8 +9,8 @@ use axum::{
 use axum_extra::extract::CookieJar;
 use openapi::models::PostGroup;
 use openapi::{
-    models::{PostLogin, ScheduleGroupIdGetPathParams, ScheduleItem}, LoginPostResponse,
-    ScheduleGroupIdPostResponse, ScheduleGroupIdPutResponse,
+    models::{PostLogin, ScheduleGroupIdGetPathParams, ScheduleItem},
+    LoginPostResponse, ScheduleGroupIdPostResponse, ScheduleGroupIdPutResponse,
 };
 
 use crate::errors::Result;
