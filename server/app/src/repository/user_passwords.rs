@@ -1,13 +1,11 @@
 use super::Repository;
 use crate::repository::{MySqlQueryResult, Password};
+use anyhow::Result;
 use sqlx::{query, query_as};
 
+#[allow(unused)]
 impl Repository {
-    pub async fn add_user(
-        &self,
-        user_name: String,
-        password: String,
-    ) -> Result<MySqlQueryResult, String> {
+    pub async fn add_user(&self, user_name: String, password: String) -> Result<MySqlQueryResult> {
         // Insert the task, then obtain the ID of this row
         let password = bcrypt::hash(password, self.bcrypt_cost).unwrap();
         println!("binary: {}, length: {}", password, password.len());
@@ -16,12 +14,8 @@ impl Repository {
             .bind(user_name)
             .bind(password)
             .execute(&self.pool)
-            .await;
-
-        match result {
-            Ok(r) => Ok(r),
-            Err(e) => Err(e.to_string()),
-        }
+            .await?;
+        Ok(result)
     }
 
     pub async fn check_user(&self, user_name: String, password: String) -> Result<bool, String> {
