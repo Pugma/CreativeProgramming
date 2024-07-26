@@ -130,7 +130,8 @@ pub async fn group_post(
     State(repo): State<Repository>,
     Json(body): Json<PostGroup>,
 ) -> crate::Result<Response> {
-    let _db_result = repo.create_group(body.group_name).await;
+    let owner_name: String = "".to_string();
+    let _db_result = repo.create_group(body.group_name, owner_name).await;
 
     let response = Response::builder();
     let rep = response.status(200).body(Body::empty()).unwrap();
@@ -142,14 +143,13 @@ pub async fn schedule_group_id_get(
     _host: Host,
     _cookies: CookieJar,
     Path(_path_params): Path<ScheduleGroupIdGetPathParams>,
-    State(_repo): State<Repository>,
+    State(repo): State<Repository>,
     // Json(body): Json<Sched>,
 ) -> crate::Result<Response> {
+    repo.get_schedule().await?;
     // let user_name: UserName = UserName("".to_string());
     let _aaa = "Stringにしたいんだが！？".to_string();
     let _bbb: Vec<ScheduleItem> = vec![];
-
-    // let a = _repo.(_path_params.group_id).await.unwrap();
 
     // let result = match path_params.group_id.as_str() {
     //     "_aaa" => Ok(ScheduleGroupIdGetResponse::Status200_Success(bbb)),
@@ -165,9 +165,10 @@ pub async fn schedule_group_id_post(
     _method: Method,
     _host: Host,
     _cookies: CookieJar,
-    State(_repo): State<Repository>,
+    State(repo): State<Repository>,
     Json(body): Json<PostLogin>,
 ) -> crate::Result<Response> {
+    repo.register_schedule().await?;
     let aaa = "Stringにしたいんだが！？".to_string();
 
     let _result = match body.user_name.as_str() {
@@ -184,9 +185,10 @@ pub async fn schedule_group_id_put(
     _method: Method,
     _host: Host,
     _cookies: CookieJar,
-    State(_repo): State<Repository>,
+    State(repo): State<Repository>,
     Json(body): Json<PostLogin>,
 ) -> crate::Result<Response> {
+    repo.edit_schedule().await?;
     let aaa = "Stringにしたいんだが！？".to_string();
 
     let _result = match body.user_name.as_str() {
