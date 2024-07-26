@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-axum = "0.7.5"
+axum = {version = "0.7.5", features = ["macros"]}
 tokio = { version = "1.37.0", features = ["macros", "rt-multi-thread"] }
 openapi = { path = "../apis/" }
 axum-extra = "0.9.3"
@@ -18,6 +18,8 @@ bcrypt = "0.15.1"
 async-session = "3.0.0"
 anyhow = {version = "1.0.86", features = ["backtrace"]}
 serde = "1.0.204"
+tracing = "0.1.40"
+thiserror = "1.0.63"
 
 [dependencies.async-sqlx-session]
 git = "https://github.com/maxcountryman/async-sqlx-session.git"
