@@ -1,6 +1,7 @@
 use super::{Repository, UserName};
 use crate::repository::{DbGroupItem, GroupItem};
 use sqlx::{query, query_as};
+use uuid::Uuid;
 
 #[allow(unused)]
 impl Repository {
@@ -34,11 +35,21 @@ impl Repository {
         }
     }
 
-    pub async fn create_group(&self, group_name: String) -> sqlx::Result<()> {
-        let _request = query("sqsgalslsglsajkjsagl")
-            .bind(group_name)
-            .execute(&self.pool)
-            .await?;
+    pub async fn create_group(&self, group_name: String, owner_name: String) -> sqlx::Result<()> {
+        let uuid = Uuid::now_v7();
+        let _request = query(
+            "
+            INSERT INTO `groups`
+            ( `groupUuid`, `groupName`, `ownerName`, `lastUpdate`, )
+            VALUES ( ?, ?, ?, ? )
+            ",
+        )
+        .bind(uuid)
+        .bind(group_name)
+        .bind(owner_name)
+        .execute(&self.pool)
+        .await?;
+
         Ok(())
     }
 }

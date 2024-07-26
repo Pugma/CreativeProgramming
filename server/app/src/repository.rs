@@ -13,6 +13,7 @@ use std::string::String;
 use async_sqlx_session::MySqlSessionStore;
 use openapi::models::GroupItem;
 
+mod group_schedules;
 mod user_groups;
 mod user_passwords;
 mod user_sessions;
