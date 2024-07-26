@@ -2,6 +2,7 @@ use super::{Repository, UserName};
 use crate::repository::{DbGroupItem, GroupItem};
 use sqlx::{query, query_as};
 
+#[allow(unused)]
 impl Repository {
     pub async fn get_groups_by_user(&self, user_name: UserName) -> Result<Vec<GroupItem>, String> {
         let user_name: String = user_name.get_string();

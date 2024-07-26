@@ -33,11 +33,6 @@ paths:
       responses:
         200:
           description: Success
-          headers:
-            Set-Cookie:
-              schema:
-                type: string
-                example: session_id=abcde12345; Path=/; HttpOnly
         400:
           description: Bad request
 
@@ -55,11 +50,6 @@ paths:
       responses:
         200:
           description: Success
-          headers:
-            Set-Cookie:
-              schema:
-                type: string
-                example: session_id=abcde12345; Path=/; HttpOnly
         400:
           description: Bad request
 
@@ -220,5 +210,6 @@ components:
       type: apiKey
       in: cookie
       name: session_id
+
 security:
   - cookieAuth: []

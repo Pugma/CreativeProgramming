@@ -17,7 +17,7 @@ mod user_groups;
 mod user_passwords;
 mod user_sessions;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Repository {
     pool: MySqlPool,
     session_store: MySqlSessionStore,
@@ -36,6 +36,8 @@ impl Repository {
             MySqlSessionStore::from_client(pool.clone()).with_table_name("user_sessions");
 
         session_store.migrate().await?;
+
+        println!("correctly connected to DB!!!");
 
         Ok(Self {
             pool,
