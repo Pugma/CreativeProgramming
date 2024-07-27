@@ -12,8 +12,4 @@ import SignUp from '@/components/SignUp.vue'
   </PageContainer>
 </template>
 
-<style lang="scss" scoped>
-// * {
-//   color: $color-primary;
-// }
-</style>
+<style lang="scss" scoped></style>

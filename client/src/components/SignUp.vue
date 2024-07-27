@@ -14,7 +14,7 @@ const request = ref<PostLogin>({
 const postNewAccount = () => {
   request.value.UserName = newUserName.value
   request.value.Password = newPassword.value
-  apis.signUpPost(request.value)
+  apis.auth.signUpPost(request.value)
 }
 </script>
 
