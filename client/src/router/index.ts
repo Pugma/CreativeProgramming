@@ -14,12 +14,12 @@ const router = createRouter({
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import('../views/SignUp.vue')
+      component: () => import('@/components/SignUp.vue')
     },
     {
       path: '/:pathMatch(.*)*',
       name: 'Not found',
-      component: () => import('../views/NotFound.vue')
+      component: () => import('@/views/NotFound.vue')
     }
   ],
   history: createWebHistory(import.meta.env.BASE_URL)

@@ -2,8 +2,8 @@ import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import dns from "dns";
-dns.setDefaultResultOrder("ipv4first");
+import dns from 'dns'
+dns.setDefaultResultOrder('ipv4first')
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -18,6 +18,13 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:3000',
         changeOrigin: true
+      }
+    }
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@import "@/styles/color.scss";`
       }
     }
   }
