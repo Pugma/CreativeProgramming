@@ -1,0 +1,34 @@
+// ライトモード
+$color-primary: #005bac;
+$color-primary-text: #eff0f0;
+
+$color-secondary: #b2bdc7;
+$color-secondary-text: #333e47;
+
+$color-background: #ffffff;
+$color-text: #000000;
+
+// ダークモード
+$color-primary-dark: #005bac;
+$color-primary-text-dark: #eff0f0;
+
+$color-secondary-dark: #b2bdc7;
+$color-secondary-text-dark: #333e47;
+
+$color-background-dark: #000000;
+$color-text-dark: #ffffff;
+
+// スマホ対応
+$sp: 768px;
+
+@mixin sp {
+  @media screen and (max-width: $sp) {
+    @content;
+  }
+}
+
+@mixin dark {
+  @media screen and (prefers-color-scheme: dark) {
+    @content;
+  }
+}
