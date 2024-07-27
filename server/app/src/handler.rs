@@ -1,5 +1,6 @@
+use crate::repository::user_sessions::Aaa;
 use crate::repository::Repository;
-use axum::http::Method;
+use axum::http::{HeaderMap, Method};
 use axum::{
     body::Body,
     extract::{Host, Path, State},
@@ -22,11 +23,11 @@ pub async fn sign_up_post(
     _cookies: CookieJar,
     State(repo): State<Repository>,
     Json(body): Json<PostLogin>,
-) -> Result<Response> {
+) -> Result<(HeaderMap, Response)> {
     repo.add_user(body.user_name.clone(), body.password.clone())
         .await?;
 
-    let _user_session = match repo.create_session_for_user(body.user_name.clone()).await {
+    let user_session = match repo.create_session_for_user(body.user_name.clone()).await {
         Ok(session) => session,
         Err(e) => {
             println!("error: {}", e);
@@ -38,8 +39,10 @@ pub async fn sign_up_post(
 
     let response = Response::builder();
 
+    let headers = HeaderMap::make_cookie_header(user_session).await?;
+
     let rep = response.status(200).body(Body::empty()).unwrap();
-    Ok(rep)
+    Ok((headers, rep))
 }
 
 pub async fn login_post(
@@ -48,9 +51,10 @@ pub async fn login_post(
     _cookies: CookieJar,
     State(repo): State<Repository>,
     Json(body): Json<PostLogin>,
-) -> Result<Response> {
+) -> Result<(HeaderMap, Response)> {
     let copied_password: String = body.password.clone();
-    let db_result: Result<bool, String> = repo.check_user(body.user_name, body.password).await;
+    let db_result: Result<bool, String> =
+        repo.check_user(body.user_name.clone(), body.password).await;
 
     let _result = match db_result {
         Ok(true) => Ok(LoginPostResponse::Status200_Success),
@@ -60,6 +64,16 @@ pub async fn login_post(
         }
         Err(e) => Err(e),
     };
+
+    let user_session = match repo.create_session_for_user(body.user_name).await {
+        Ok(session) => session,
+        Err(e) => {
+            println!("error: {}", e);
+            "".to_string()
+        }
+    };
+
+    let headers = HeaderMap::make_cookie_header(user_session).await?;
 
     let response = Response::builder();
 
@@ -98,7 +112,7 @@ pub async fn login_post(
     // };
 
     let rep = response.status(200).body(Body::empty()).unwrap();
-    Ok(rep)
+    Ok((headers, rep))
 }
 
 pub async fn me_get(

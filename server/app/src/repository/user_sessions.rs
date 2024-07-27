@@ -1,5 +1,9 @@
+use std::time::Duration;
+
+use super::constants::{SESSION_COOKIE_DURATION, SESSION_COOKIE_NAME};
 use anyhow::{Context, Result};
 use async_session::{Session, SessionStore};
+use axum::http::{header::SET_COOKIE, HeaderMap};
 
 use super::UserName;
 use crate::Repository;
@@ -12,6 +16,8 @@ impl Repository {
         session
             .insert("user", user)
             .with_context(|| "failed to insert user into session")?;
+
+        session.expire_in(Duration::from_secs(SESSION_COOKIE_DURATION));
 
         let res = self
             .session_store
@@ -34,5 +40,23 @@ impl Repository {
         };
         self.session_store.destroy_session(session).await?;
         Ok(Some(()))
+    }
+}
+
+pub trait Aaa {
+    async fn make_cookie_header(value: String) -> crate::Result<HeaderMap>;
+}
+
+impl Aaa for HeaderMap {
+    async fn make_cookie_header(value: String) -> crate::Result<HeaderMap> {
+        let header = [(
+            SET_COOKIE,
+            format!("{SESSION_COOKIE_NAME}={value}; Path=/; Max-Age={SESSION_COOKIE_DURATION}; HttpOnly",)
+                .parse()
+                .with_context(|| "failed to set cookie to header value")?,
+        )]
+        .into_iter()
+        .collect();
+        Ok(header)
     }
 }

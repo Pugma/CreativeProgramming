@@ -16,8 +16,12 @@ use openapi::models::GroupItem;
 mod group_schedules;
 mod user_groups;
 mod user_passwords;
-mod user_sessions;
+pub mod user_sessions;
 
+pub mod constants {
+    pub const SESSION_COOKIE_NAME: &str = "session_id";
+    pub const SESSION_COOKIE_DURATION: u64 = 604800; // 7days
+}
 #[derive(Debug, Clone)]
 pub struct Repository {
     pool: MySqlPool,
