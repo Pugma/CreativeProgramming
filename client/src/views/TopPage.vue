@@ -5,7 +5,7 @@ import SignUp from '@/components/SignUp.vue'
 </script>
 
 <template>
-  <PageHeader title="トップページ" />
+  <PageHeader />
   <PageContainer>
     このサイトは、予定管理を簡単に行うためのものです
     <sign-up />

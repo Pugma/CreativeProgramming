@@ -1,8 +1,14 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+interface Props {
+  title: string
+}
+
+defineProps<Props>()
+</script>
 
 <template>
   <header>
-    <h1>Scheduling</h1>
+    <h1>{{ title }}</h1>
   </header>
 </template>
 
@@ -10,7 +16,5 @@
 header {
   width: 100vw;
   height: 5rem;
-  background-color: #aaaaaa;
-  align-content: center;
 }
 </style>
