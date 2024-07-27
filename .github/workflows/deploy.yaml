@@ -11,6 +11,9 @@ on:
 env:
   IMAGE_NAME: schedule
 
+permissions:
+  contents: write
+
 jobs:
   # GitHubリリース機能で自動リリース
   release:
