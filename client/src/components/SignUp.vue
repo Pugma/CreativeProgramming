@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { AuthApi, type PostLogin, Configuration } from '@/lib/apis/generated'
+import apis, { type PostLogin } from '@/lib/apis'
 import PageHeader from '@/components/PageHeader.vue'
 import PageContainer from '@/components/PageContainer.vue'
-
-const apis = new AuthApi(new Configuration({ basePath: '/api' }))
 
 const newUserName = ref('')
 const newPassword = ref('')
@@ -21,7 +19,7 @@ const postNewAccount = () => {
 </script>
 
 <template>
-  <PageHeader title="サインアップ"/>
+  <PageHeader title="サインアップ" />
   <PageContainer>
     <div>
       ユーザー名
@@ -29,7 +27,8 @@ const postNewAccount = () => {
     </div>
     <div>
       パスワード
-      <input v-model="newPassword" @keypress.prevent.enter="postNewAccount" />
+      <input type="password" v-model="newPassword" @keypress.prevent.enter="postNewAccount" />
     </div>
+    <button @click="postNewAccount">サインアップ</button>
   </PageContainer>
 </template>
