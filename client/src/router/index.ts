@@ -9,12 +9,20 @@ const router = createRouter({
       component: TopPage
     },
     {
-      path: '/signUp',
-      name: 'SignUp',
+      path: '/me',
+      name: 'MyPage',
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import('@/components/SignUp.vue')
+      component: () => import('@/views/MyPage.vue')
+    },
+    {
+      path: '/group/:groupId',
+      name: 'GroupPage',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('@/views/GroupPage.vue')
     },
     {
       path: '/:pathMatch(.*)*',
