@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `groups` (
     `groupUuid` VARCHAR(32) NOT NULL,
     `groupName` VARCHAR(32) NOT NULL,
     `ownerName` VARCHAR(50) NOT NULL,
-    `lastUpdate` DATETIME NOT NULL,
+    `lastUpdate` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`groupId`),
     INDEX (`lastUpdate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `schedule` (
     `since` DATE NOT NULL,
     `until` DATE NOT NULL,
     `condition` TINYINT(1) NOT NULL,
-    `lastUpdate` DATETIME NOT NULL,
+    `lastUpdate` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`groupId`),
     INDEX (`lastUpdate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
