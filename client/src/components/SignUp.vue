@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import apis, { type PostLogin } from '@/lib/apis'
-import PageHeader from '@/components/PageHeader.vue'
 import PageContainer from '@/components/PageContainer.vue'
+import PageTitle from '@/components/PageTitle.vue'
 
 const newUserName = ref('')
 const newPassword = ref('')
@@ -19,8 +19,8 @@ const postNewAccount = () => {
 </script>
 
 <template>
-  <PageHeader title="サインアップ" />
   <PageContainer>
+    <PageTitle title="サインアップ" />
     <div>
       ユーザー名
       <input v-model="newUserName" @keypress.prevent.enter="postNewAccount" />
