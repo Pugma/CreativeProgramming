@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import apis from '@/lib/apis'
-import { type PostLogin } from '@/lib/apis/generated'
+import { type PostLogin } from '@/lib/apis'
 import PageHeader from '@/components/PageHeader.vue'
 import PageContainer from '@/components/PageContainer.vue'
 
