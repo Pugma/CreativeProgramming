@@ -40,8 +40,8 @@ impl Repository {
         let _request = query(
             "
             INSERT INTO `groups`
-            ( `groupUuid`, `groupName`, `ownerName`, `lastUpdate`, )
-            VALUES ( ?, ?, ?, ? )
+            ( `groupUuid`, `groupName`, `ownerName` )
+            VALUES ( ?, ?, ? )
             ",
         )
         .bind(uuid)
