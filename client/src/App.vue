@@ -3,7 +3,10 @@ import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <RouterView />
+  <Suspense>
+    <RouterView />
+    <template #fallback>loading...</template>
+  </Suspense>
 </template>
 
 <style scoped>
