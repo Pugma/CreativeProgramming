@@ -76,6 +76,7 @@ jobs:
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.SERVER_SSH_KEY }}
+          name: id_eb25519
           known_hosts: ${{ secrets.SERVER_KNOWN_HOSTS }}
       - name: Deploy
         run: ssh -t ${{ secrets.SERVER_DEPLOY_USER }}@${{ secrets.SERVER_DEPLOY_HOST }} -p ${{ secrets.SERVER_DEPLOY_PORT }} "sudo sh /srv/schedule/deploy.sh schedule"
