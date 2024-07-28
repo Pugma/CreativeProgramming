@@ -7,14 +7,13 @@ defineProps<Props>()
 </script>
 
 <template>
-  <header>
+  <div class="title">
     <h1>{{ title }}</h1>
-  </header>
+  </div>
 </template>
 
 <style scoped lang="scss">
-header {
-  width: 100vw;
+.title {
   height: 5rem;
 }
 </style>
