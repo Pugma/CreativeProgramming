@@ -10,6 +10,7 @@
 header {
   width: 100vw;
   height: 5rem;
+  padding: 8px;
   background-color: #aaaaaa;
   align-content: center;
 }

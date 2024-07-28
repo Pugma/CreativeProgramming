@@ -6,6 +6,7 @@ import { ref } from 'vue'
 import PageTitle from '@/components/PageTitle.vue'
 import useParam from '@/lib/param'
 import ScheduleList from '@/components/ScheduleList.vue'
+import ScheduleInput from '@/components/ScheduleInput.vue'
 
 const info = ref<ScheduleItem[]>([])
 const groupId = useParam('groupId')
@@ -18,6 +19,7 @@ info.value = (await apis.schedule.scheduleGroupIdGet(groupId.value)).data
   <PageContainer>
     <PageTitle title="メンバーの忙しさ一覧" />
     <ScheduleList :schedules="info" />
+    <ScheduleInput />
   </PageContainer>
 </template>
 
