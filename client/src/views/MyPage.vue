@@ -7,13 +7,13 @@ import GroupList from '@/components/GroupList.vue'
 import PageTitle from '@/components/PageTitle.vue'
 
 const groups = ref<GroupItem[]>([])
-groups.value = (await apis.user.meGet()).data
+groups.value = (await apis.group.groupGet()).data
 </script>
 
 <template>
   <PageHeader />
   <PageContainer>
-    <PageTitle title="所属しているグループ一覧" />
+    <PageTitle title="所属グループ一覧" />
     <GroupList :groups="groups" />
   </PageContainer>
 </template>
