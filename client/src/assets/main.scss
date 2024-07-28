@@ -5,31 +5,30 @@
   font-weight: normal;
 }
 
-a,
-.green {
+a {
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
+  color: #66aaff;
   transition: 0.4s;
-  padding: 3px;
 }
 
 @media (hover: hover) {
   a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
+    background-color: #4488ff40;
+    transition: 0.3s;
   }
 }
 
 h1 {
   font: {
-    size: 2rem;
-    weight: 700;
+    size: 2.2rem;
+    weight: 800;
   }
 }
 
 h2 {
   font: {
-    size: 1.8rem;
-    weight: 700;
+    size: 2rem;
+    weight: 800;
   }
 }
 
@@ -49,14 +48,14 @@ h4 {
 
 h5 {
   font: {
-    size: 2rem;
-    weight: 700;
+    size: 1.8rem;
+    weight: 600;
   }
 }
 
 h6 {
   font: {
-    size: 1.8rem;
-    weight: 700;
+    size: 1.5rem;
+    weight: 600;
   }
 }
